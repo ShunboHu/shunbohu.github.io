@@ -1,0 +1,124 @@
+# conf.mk
+#
+# paratecSGL configuration for make
+#
+# nano.lbl.gov
+#
+# David Prendergast, June 1, 2006, UCB
+
+# ====================================================================== 
+# SUFFIXES
+
+.SUFFIXES :
+.SUFFIXES : .c .f90 .f90p .f .fp .ph .m4h .o
+
+# ====================================================================== 
+# rules for compilation
+
+# In the following rules EXTFLAGS refers to the list 
+# of object files necessary for this compilation
+
+# New paradigm:
+#.a.b:
+#	$(ACOMPILER) $(AFLAGS) -c $< -o $>
+
+.m4h.ph:
+	$(M4) $(M4ARGS) $(M4SRC) $< >$@
+
+.f.o:
+	$(F77) $(F77FLAGS) -c $<
+
+.f90.o:
+	$(F90) $(F90FLAGS) -c $<
+
+.f90p.o:
+	$(M4) $(M4ARGS) $(M4SRC) $< >$*.p.f90
+	$(F90) $(F90FLAGS) -c $*.p.f90
+	@\mv $*.p.o $*.o
+
+# Only necessary for compiling microbench
+.c.o:
+	$(CC) $(CFLAGS) -c $< 
+
+# ====================================================================== 
+# Change the variables below to suit your environment
+# ====================================================================== 
+# Note that the DEPTH variable is set on the command line by individual
+# commands in Makefile.mk
+# flag used to set machine architecture flag 
+# for preprocessing machine dependent code
+ARCH = I386
+#export DEPTH=/public/home/users/shu001/software/paratec_wfn
+# Directories
+EXECDIR = $(DEPTH)/bin
+#
+# flavor (determines name of executable)
+#
+FLAVOR		= $(MSGPASSFLAVOR)
+# ====================================================================== 
+# Compiler and command info
+#F90		= mpif90
+#F77		= mpif90
+#CC		= mpicc
+F90		= mpiifort
+F77		= mpiifort
+CC		= mpiicc
+MV		= /usr/bin/mv
+M4		= /usr/bin/m4
+AR              = /usr/bin/ar
+ARFLAGS         = ruv
+export MKLROOT =/public/software//compiler/intel/intel-compiler-2017.5.239/mkl
+# Include some optimization
+# FFLAGS 		= -O3 -r8  -align all  -I/util/intel/impi/3.2.2.006/include -static_mpi 
+# FFLAGS 		= -O3 -r8 -check all  -align all  -I/util/intel/impi/4.0.0.025/intel64/include -static_mpi 
+# FFLAGS 		= -O2 -r8 -check bounds -align all -I $(MKLROOT)/lib/intel64/include -static_mpi 
+FFLAGS          = -O2 -r8 -check bounds -align all -I /public/software/mpi/intelmpi/2017.4.239/intel64/include -static_mpi
+# FFLAGS 		= -O3 -align all -r8
+F90FLAGS        = $(FFLAGS) $(FINC)
+F77FLAGS        = $(FFLAGS) 
+# Local FFTW
+FFTW_DIR        = /public/home/users/shu001/software/fftw-2.1.5
+#(mdj) needs fftw_f77.i include file, not part of devel package
+FFTW_HEADER_INC = -I$(FFTW_DIR)/fortran
+FFTW_DAVEGP_DIR = $(DEPTH)/src/fftw_davegp
+FFTW_DAVEGP_INC = -I$(FFTW_DAVEGP_DIR)
+FLINKSPECIAL    = -L$(FFTW_DAVEGP_DIR) -lfftw_davegp 
+FINC            = $(FFTW_DAVEGP_INC) $(FFTW_HEADER_INC) 
+# libraries
+SHAREDLIB	= $(DEPTH)/src/shared/libshared.a
+MATHLIBS        = -static_mpi -L $(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 /public/home/users/shu001/software/fftw-2.1.5/lib/libfftw.a
+#-L/lib64 -L/lib/ -L/usr/lib64 -L/usr/lib -lifport -lifcoremt -limf -lsvml -lm -lipgo -lirc -lpthread -lirc_s -ldl
+#MATHLIBS        = -static_mpi -L $(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -L $(FFTW_DIR)/lib -lfftw -lrt -lpthread -openmp -ldl
+
+MAKEOPTIONS = --no-print-directory
+PLAT=x86_64
+# type of parallel environment
+MSGPASSFLAVOR	= .mpi
+# MATHPARALLEL	= $(SCALAPACKLIBS)
+# MATHPARALLEL    = /util64/blas-goto/R1.00/libgoto_opteron64p-r1.00.so 
+# ====================================================================== 
+# sources that the m4 preprocessor should include
+#
+M4DIR		= $(DEPTH)/src/macros
+M4GLOBAL   	= $(M4DIR)/global/m4undef.m4 
+M4FFT		= $(M4DIR)/fft/fft_macros.m4
+M4FILES		= $(M4GLOBAL)
+# 
+# flags that m4 should use
+#
+M4SYSFLAGS	= -D$(ARCH) -DCLT2 -DFFTW -DINT4 -DFAST_CONVOLUTE
+M4MSGPASS	= -DMPI
+M4SCALAPACK	= -DSCALAPACK
+
+M4FLAGS 	= $(M4SYSFLAGS) $(M4MSGPASS) $(M4SCALAPACK)
+# make sure to include the global macros since the -P option to prefix
+# m4 directives with "m4_" does not exist on AIX
+M4ARGS          = $(M4FLAGS) $(M4GLOBAL)
+# Use variable M4SRC in src directories to indicate which other M4FILES to use
+
+#
+# libraries
+#
+#mdj (order changed to statically link in intel mpi )
+#LIBS 		= $(MATHPARALLEL) $(MATHLIBS) $(MSGPASSLIBS) $(SHAREDLIB)
+LIBS 		= $(SHAREDLIB) $(MATHPARALLEL) $(MATHLIBS) $(MSGPASSLIBS)

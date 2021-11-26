@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Git</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+
+<p>使用Github来托管程序仓库，方便程序管理。
+</p>	
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h3><b>SSH Key</b></h3>
+<pre class="highlight"><code>
+Windows先安装Git，安装完成后，在开始菜单里找到“Git”->“Git Bash”
+配置账号
+$ git config --global user.name "hahaha"
+$ git config --global user.email "hahaha@gmail.com"
+
+
+$ ssh-keygen -t rsa -C “hahaha@gmail.com”
+按3个回车，密码为空
+最后得到了两个文件：id_rsa 和id_rsa.pub
+去https//github.com网站 找到setting里SSH and GPG keys添加“id_rsa.pub”里面的公钥
+$cd ~/.ssh
+
+测试
+$ ssh git@github.com
+如果SSH 相关错误与提示：
+PTY allocation request failed on channel 0
+Hi fanhaojia! You've successfully authenticated, but GitHub does not provide shell access.
+Connection to github.com closed.
+PTY 是伪终端，提示伪终端请求分配失败。 然后连接成功后输出欢迎信息，最后连接又被关闭了。
+PTY allocation request failed这个警告无伤大雅，它会出现是当使用命令行 SSH 登录了一个不提供正常交互式访问的服务。
+基于 SSH 的 Git 不需要一个 tty, GitHub（GitLab 也应该一样）的 SSH 服务被配置成拒绝分配一个 tty 给入站连接。
+你可以告诉 SSH 不要请求一个 tty，使用ssh -T的选项
+$ ssh -T git@github.com
+
+
+$ ssh fanhaojia@github.com
+The authenticity of host 'github.com (...)' can't be established.
+RSA key fingerprint is
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'github.com,....' (RSA) to the list of known hosts.
+....@github.com: Permission denied (publickey).
+
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h3><b>同步远程和本地库 Git clone and push</b></h3>
+<pre class="highlight"><code>
+1.从github上使用git clone https://github.com/xxxxxxx/xxxxx.git克隆到本地
+
+
+2.将本地文件夹test内的所有文件同步到https://github.com/hahaha/test.git
+git init
+Initialized empty Git repository in /Users/michael/learngit/.git/
+产生.git文件夹,如果你没有看到.git目录，那是因为这个目录默认是隐藏的，用ls -ah命令就可以看见。
+git status 用于随时查看提交修改删除的记录
+
+git remote add origin git@github.com:hahaha/test.git  (连接远程)
+“如果出现错误：fatal: remote origin already exists，则执行以下语句：
+查看git remote -v 
+删除 git remote remove **”
+
+git add . （将本地所有文件的改动添加到暂存区）
+git commit -m "提交说明"
+git push origin master 将本地更改推送到远程master分支。这样你就完成了向远程仓库的推送。
+
+“例子：
+本地进入一个test文件夹
+git init
+git remote add origin git@github.com:hahaha/test.git
+vi readme 编辑保存一个readme文件
+第一步，用git add命令告诉Git，把文件添加到仓库：
+git add readme
+Windows中使用CRLF标识一行的结束，而在Linux/UNIX系统中只使用LF标识一行的结束。因此记事本等编辑的文件会报错：warning: LF will be replaced by CRLF in readme. The file will have its original line endings in your working directory
+建议任使用notepad++编辑保存readme
+git config --global --get core.autocrlf
+git config --get core.autocrlf
+
+第二步，用命令git commit告诉Git，把文件提交到仓库
+git commit -m "this is a test"
+然后git push origin master"
+
+如果git push origin master 时。报错 ! [rejected]      master -> master (fetch first)
+原因是没有同步远程的master，或remote上已经有了文件。（1）先同步一下git pull origin master，即将远程仓库 Github 上的文件拉下来合并之后重新推送上去 （2）可以使用git push origin master --force 强制push （极其谨慎使用,会强制覆盖）
+
+解决合并冲突（master|MERGING）
+git merge --abort
+
+“批量删除文件s或者文件夹
+git rm -r --cached .idea  #--cached不会把本地的.idea删除
+git commit -m 'delete .idea dir'
+git push -u origin master”
+
+git branch 查看当前所有的分支
+git checkout master 切换回master分支
+git merge dev 在当前的分支上合并dev分支
+git branch –d dev 删除dev分支
+git branch name 创建分支
+git add -u 添加修改过的文件到索引库
+
+</code></pre>
+</div></div>
+<p>在GitHub上免费托管的Git仓库，任何人都可以看到，但只有你自己才能改。
+如果你不想让别人看到Git库：（1）可以付费，让GitHub把公开的仓库变成私有的；（2）或搭一个自己的Git服务器。
+</p>
+
+
+
+</div>
+
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

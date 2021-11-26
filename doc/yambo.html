@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Yambo编译</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install libxc</b></h2>
+<pre class="highlight"><code>
+./configure --prefix=/public4/home/sc56152/software/libxc-5.1.6 CC="icc -std=c11 -pedantic-errors" FC=ifort
+make -j 8
+make install
+
+</code></pre>
+</div></div>
+
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install yambo-5.0.3</b></h2>
+<pre class="highlight"><code>
+先找一台能联网的Linux机器，进入yambo-5.0.3/lib/archive
+make -f Makefile.loc  下载所有外部安装包。
+然后重新打包 tar -czf yambo_new.tar.gz yambo-5.0.3
+用这个新的安装包安装，就可以避免繁琐地添加外部安装包
+
+
+source /public4/soft/modules/module.sh
+module load intel/17.0.5-cjj-public4-public4
+export MKLROOT=/public4/soft/intel/2017/compilers_and_libraries_2017.5.239/linux/mkl
+./configure --prefix=/public4/home/sc56152/software/yambo/yambo-5.0.3 FC=ifort F77=ifort CC=icc MPICC=mpiicc MPIFC=mpiifort MPIF77=mpiifort --enable-mpi --enable-uspp --enable-options-check --enable-memory-profile  --enable-iotk --enable-hdf5-p2y-support  --with-blacs-libs="-L$MKLROOT/lib/intel64 -lmkl_blacs_intelmpi_lp64" --with-scalapack-libs="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" --with-blas-libs="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" --with-lapack-libs="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" --with-fft-path=/public4/home/sc56152/software/fftw/fftw-3.3.9 --with-iotk-path=/public4/home/sc56152/software/qe/6.6.0/iotk --with-hdf5-path=/public4/home/sc56152/software/hdf5/1.12.0
+
+修改qe-6.8.0/install and qe-6.8.0/archive目录下内容，放入qe-6.8.0/archive/5.0.3.tar.gz
+*要在yambo-5.0.3/lib/yambo 放入driver文件再压缩为5.0.3.tar.gz
+cd qe-6.8.0/
+export F77=ifort
+make yambo
+ 
+
+</code></pre>
+</div></div>
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install netcdf  (old)</b></h2>
+<pre class="highlight"><code>
+
+./configure --prefix=/public4/home/sc56152/software/netcdf/4.8.1 CC=icc  --enable-shared
+CPPFLAGS=-I/public4/home/sc56152/software/hdf5/1.12.0/include
+LDFLAGS=-L/public4/home/sc56152/software/hdf5/1.12.0/lib
+make 
+make install -i
+
+./configure --prefix=/public4/home/sc56152/software/netcdf/fortran-4.5.3 CC=icc FC=ifort F77=ifort 
+--enable-shared --enable-largefile --disable-static
+CPPFLAGS="-I/public4/home/sc56152/software/hdf5/1.12.0/include -I/public4/home/sc56152/software/netcdf/4.8.1/include"
+LDFLAGS="-L/public4/home/sc56152/software/hdf5/1.12.0/lib -L/public4/home/sc56152/software/netcdf/4.8.1/lib"
+make 
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install yambo-5.0.3 (old)</b></h2>
+<pre class="highlight"><code>
+
+NETCDF_LIB="/public4/home/sc56152/software/netcdf/4.8.1/lib -lnetcdf"
+NETCDF_INC="/public4/home/sc56152/software/netcdf/4.8.1/include"
+./configure --prefix=/public4/home/sc56152/software/yambo/5.0.3 
+FC=ifort F77=ifort CC=icc MPICC=mpiicc MPIFC=mpiifort MPIF77=mpiifort CFLAGS=-O3 FCFLAGS=-O3 FFLAGS=-O3 
+--enable-mpi --enable-uspp --enable-options-check --enable-memory-profile  --enable-iotk 
+--enable-hdf5-compression --enable-hdf5-par-io --enable-hdf5-p2y-support --enable-yaml-output
+--with-netcdf-libs="$NETCDF_LIB" --with-netcdf-includedir="$NETCDF_INC"
+--with-blacs-libs="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64" 
+--with-scalapack-libs="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" 
+--with-blas-libs="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+--with-lapack-libs="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+--with-fft-path=/public4/home/sc56152/software/fftw/fftw-3.3.9
+--with-iotk-path=/public4/home/sc56152/software/qe/6.6.0/iotk
+--with-netcdf-path=/public4/home/sc56152/software/netcdf/4.8.1
+--with-netcdf-libdir=/public4/home/sc56152/software/netcdf/4.8.1/lib
+--with-hdf5-path=/public4/home/sc56152/software/hdf5/1.12.0/
+
+./configure --prefix=/public4/home/sc56152/software/yambo/5.0.3 
+FC=ifort F77=ifort CC=icc MPICC=mpiicc MPIFC=mpiifort MPIF77=mpiifort CFLAGS=-O3 FCFLAGS=-O3 FFLAGS=-O3 
+--enable-mpi --enable-uspp --enable-options-check --enable-memory-profile 
+--with-fft-path=/public4/home/sc56152/software/fftw/fftw-3.3.9
+--enable-hdf5-compression --enable-hdf5-par-io --enable-hdf5-p2y-support 
+--with-hdf5-path=/public4/home/sc56152/software/hdf5/1.10.5/install_dir 
+--with-blacs-libs="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64" 
+--with-scalapack-libs="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" 
+--with-blas-libs="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+--with-lapack-libs="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+--enable-iotk --with-iotk-path=/public4/home/sc56152/software/qe/6.6.0/iotk
+--disable-netcdf
+--with-hdf5-libdir=/public4/home/sc56152/software/hdf5/1.10.5/install_dir/lib 
+--with-hdf5-includedir=/public4/home/sc56152/software/hdf5/1.10.5/install_dir/include 
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

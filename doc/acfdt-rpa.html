@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">密度泛函理论(Density functional theory, DFT)</h2></center>
+				</header>
+
+
+<section class="wrapper style1 align-left">
+<div class="inner">
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+
+<p><strong>随机相近似</strong></p>
+<p>RPA的基本概念在多体物理中扮演着核心的角色，它由Bohm和Pines在1950年代提出[1,2]，目的是描述均匀正电荷背景下运动的均匀电子气相互作用的集体特性。从量子多体微扰理论的角度来看，原始的RPA等效于Ring diagram的无限求和[3], 如图1a。Perdew等人在70年代首先将RPA纳入进DFT框架[4]，使得RPA成为适用于计算真实材料的基态能量的第一原理方法。在DFT框架下，根据公认的交换关联泛函的分类方案(图1b)，RPA可被视为<em>E<sub>xc</sub></em>泛函的五阶近似。然而，由于RPA巨大的计算量，首次在具体材料体系上应用直到2001年由Furche实现[5]。随后，RPA 被应用到一系列体系中，包括原子体系[6]、分子体系[7]、固体[8]、表面[9]、缺陷[10]和层状材料[11]等。大量的证据表明，RPA可以以相对不是很高的计算成本极大地提升预测材料基态性质的准确性。这里，我们推荐Ren等人的综述[12,13]，Pines近期的综述[14]以及Furche最近的综述[15]。</p>
+<center><img src="../images/notes/acfdt_rpa.png" style="" width="360" /></center>
+<p>图1. (a) 对Ring diagram进行求和从而实现RPA。上方的粗线表示相互作用的格林函数，非粗线表示无相互作用的格林函数，而虚线表示两体相互作用。(b) DFT Jacobs 阶梯图。</p>
+<p>RPA可以从多个理论框架下获得，包括Coupled cluster theory [16], Green-function based many-body perturbation theory [17], Time-dependent DFT (TDDFT) [5] 以及Adiabatic connection fluctuation-dissipation theorem (ACFDT)[4,18]。这里我们暂时只介绍ACFDT-RPA过程。</p>
+<p>1 ACFDT-RPA</p>
+<p>前面我们在介绍DFT部分，给出了adiabatic connection (AC)图像下的DFT。</p>
+<p>在KS-DFT下有：</p>
+$$E\left[n\right]=T_\mathrm{s}\left[\psi_n\right]+E_{\mathrm{ext}}\left[n\right]+E_\mathrm{H}\left[n\right]+E_{\mathrm{xc}}\left[n\right]$$
+<p>其中<em>E<sub>ext</sub></em>和<em>E<sub>H</sub></em>为n(<strong>r</strong>)的显函数，T<sub>s</sub>为无相互作用体系单粒子轨道表示，而只有<em>E<sub>XC</sub></em>是未知的。通过AC可以获得<em>E<sub>XC</sub></em>的精确的表达式，用密度-密度关联函数表示为：</p>
+$$
+E_{\mathrm{xc}}[n]=\int_{0}^{1} d \lambda \frac{1}{2} \iint d \boldsymbol{r} d \boldsymbol{r}^{\prime} \frac{\left\langle\Psi\left|\delta \hat{n}(\boldsymbol{r}) \delta \hat{n}\left(\boldsymbol{r}^{\prime}\right)\right| \Psi_{\lambda}\right\rangle- n(\boldsymbol{r}) \delta\left(\boldsymbol{r}-\boldsymbol{r}^{\prime}\right)}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|}
+$$
+<p>在构建LDA，GGA和meta-GGA等泛函时，仅包含了局域或半局域的量，例如电子密度、密度梯度和动能密度等，而杂化泛函中包含了非局域量-约化密度矩阵。如果要比这些近似走得更远，则需要包含真实物理系统中的更多信息。出与这一目的，有必要加入零温度波动耗散定理[4]，该理论将密度与密度之间的关联(涨落)与系统的密度响应函数的虚部(耗散)相联系，即：</p>
+$$
+\left\langle\Psi_{\lambda}\left|\delta \hat{n}(\boldsymbol{r}) \delta \hat{n}\left(\boldsymbol{r}^{\prime}\right)\right| \Psi_{\lambda}\right\rangle=-\frac{1}{2 \pi} \int_{-\infty}^{\infty} d \omega \operatorname{Im} \chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, \omega\right)
+$$
+<p>其中密度响应函数
+$$\chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, \omega\right)=\delta n_{\lambda}(\boldsymbol{r}, \omega) / \delta v^{ext}\left(\boldsymbol{r}^{\prime}, \omega\right)$$
+描述了在空间在<strong><em>r</em></strong>处的部分相互作用体系的密度由于在<strong><em>r'</em></strong>局域势的变化所产生的变化。由此，我们获得：</p>
+$$
+E_{\mathrm{xc}}=\frac{1}{2} \int_{0}^{1} d \lambda \iint d \boldsymbol{r} d \boldsymbol{r}^{\prime} \frac{1}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|}\left(-\frac{1}{2 \pi} \int_{-\infty}^{\infty} d \omega \operatorname{lm} \chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, \omega\right)-\delta\left(\boldsymbol{r}-\boldsymbol{r}^{\prime}\right) n(\boldsymbol{r})\right)
+$$
+$$
+= \frac{1}{2} \int_{0}^{1} d \lambda \iint d \boldsymbol{r} d \boldsymbol{r}^{\prime} \frac{1}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|}\left(-\frac{1}{\pi} \int_{0}^{\infty} d \omega \chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)-\delta\left(\boldsymbol{r}-\boldsymbol{r}^{\prime}\right) n(\boldsymbol{r})\right)
+$$
+<p>上述频率积分可以在虚轴上执行，源于 \(\chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, \omega\right)\) 的解析结构及其在虚轴上为实数的特点，因此可以可观地简化计算复杂度。至此，ACFDT将求解<em>E<sub>XC</sub></em>的问题转换成了计算沿AC路径连续的一组虚拟系统的响应函数的问题，而这一步由于严格的\(\chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, \omega\right)\) 也是未知的，所以仍然需要近似。根据线性响应TDDFT，&lambda;&gt;0的相互作用响应函数&chi;<sup>&lambda;</sup>可以通过Dyson-like方程与无相互作用响应函数&chi;<sup>0</sup>相联系：</p>
+$$
+\chi^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)=\chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)+\int d \boldsymbol{r}_{1} d \boldsymbol{r}_{2} \chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}_{1}, i \omega\right)\left[\frac{\lambda}{\left|\boldsymbol{r}_{1}-\boldsymbol{r}_{2}\right|}+f_{\mathrm{xc}}^{\lambda}\left(\boldsymbol{r}_{1}, \boldsymbol{r}_{2}, i \omega\right)\right] \chi^{\lambda}\left(\boldsymbol{r}_{2}, \boldsymbol{r}^{\prime}, \omega\right)
+$$
+<p>其中，</p>
+$$
+f_{xc}\left(\boldsymbol{r}_{1}, \boldsymbol{r}_{2}, i \omega\right)=\frac{\delta v_{\mathrm{xc}}\left(\boldsymbol{r}_{1}\right)}{\delta n\left(\boldsymbol{r}_{2}, \omega\right)}=\frac{\delta^{2} E_{\mathrm{xc}}[n]}{\delta n\left(\boldsymbol{r}_{1}\right) \delta n\left(\boldsymbol{r}_{2}, \omega\right)}
+$$
+<p>被称为核函数，由交换关联势函数相对于与频率相关的密度的导数给出。显然，核函数是一个求解非常复杂的物理量，目前仍在进行大量的工作以寻找关于它更好的近似[19]。在这种情况下，随机相近似等于简单地忽略了核函数，并将由此产生的相互作用响应函数称为RPA响应函数：</p>
+$$
+\chi_{\mathrm{RPA}}^{\lambda}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)=\chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)+\int d \boldsymbol{r}_{1} d \boldsymbol{r}_{2} \chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}_{1}, i \omega\right) \frac{\lambda}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|} \chi_{\mathrm{RPA}}^{\lambda}\left(\boldsymbol{r}_{2}, \boldsymbol{r}^{\prime}, \omega\right)
+$$
+<p>在物理上，RPA在这里对应于线性化的与时间相关的Hartree近似，通过该近似，可以忽略由于外部扰动引起的交换相关电位的变化。而独立粒子响应函数\(\chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)\)可以由单粒子KS轨道，轨道能量及占据数所给出：</p>
+$$
+\chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)=\sum_{m n} \frac{\left(f_{m}-f_{n}\right) \psi_{m}^{*}(\boldsymbol{r}) \psi_{n}(\boldsymbol{r}) \psi_{n}^{*}\left(\boldsymbol{r}^{\prime}\right) \psi_{m}\left(\boldsymbol{r}^{\prime}\right)}{\varepsilon_{m}-\varepsilon_{n}-i \omega}
+$$
+<p>结合上式和<em>E<sub>XC</sub></em>沿着AC路径积分响应函数式，可进一步分解RPA <em>E<sub>XC</sub></em>为：</p>
+$$
+E_{\mathrm{xc}}^{\mathrm{RPA}}=E_{\mathrm{x}}^{\mathrm{EX}}+E_{\mathrm{c}}^{\mathrm{RPA}}
+$$
+<p>其中，</p>
+$$
+\begin{aligned} E_{\mathrm{x}}^{\mathrm{EX}}=\frac{1}{2} \iint d r d r^{\prime} & \frac{1}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|}\left(-\frac{1}{\pi} \int_{0}^{\infty} d \omega \chi^{0}\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}, i \omega\right)-\delta\left(\boldsymbol{r}-\boldsymbol{r}^{\prime}\right) n(\boldsymbol{r})\right) \\ &=-\sum_{m n} f_{m} f_{n} \iint d \boldsymbol{r} d \boldsymbol{r}^{\prime} \frac{\psi_{m}^{*}(\boldsymbol{r}) \psi_{n}(\boldsymbol{r}) \psi_{m}^{*}\left(\boldsymbol{r}^{\prime}\right) \psi_{n}\left(\boldsymbol{r}^{\prime}\right)}{\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|} \end{aligned}
+$$
+<p>该式即KS-DFT中的exact-exchange energy，也等于HF交换能(但此处使用了KS轨道，并将其扩展到允许分数占据数)。</p>
+<p>其中\(v\left(\boldsymbol{r}, \boldsymbol{r}^{\prime}\right)=1 /\left|\boldsymbol{r}-\boldsymbol{r}^{\prime}\right|\)
+至此，ACFDT框架下RPA过程下的<em>E<sub>XC</sub></em>就描述完了。在实际计算中，体系的总能量将分成两部分分别进行计算，即：</p>
+$$
+E_{RPA}=E_{EXX}+E_{C}
+$$
+<p>其中等于用KS轨道演化的HF能，它包含动能项，背景离子势能、Hartree能以及交换能，而关联能则由上述RPA给出。这样处理下，具备三个有吸引力的特征：</p>
+<ul>
+<li>Exact-exchange能恰好消除了Hartree能量中的self-interaction误差。</li>
+<li>RPA关联能是完全非局域的，它自动地并且无缝地包含长van der Waals (vdW)相互作用。</li>
+<li>RPA包含了动力学屏蔽效应，即它考虑了一系列&ldquo;ring&rdquo;图到无穷阶的求和，使得它可以处理小带隙或者金属体系(这些体系有限阶的多体微扰理论无法处理)。</li>
+</ul>
+<p><strong>&nbsp;</strong></p>
+<p><strong>参考文献</strong>：</p>
+<p>[1]&nbsp; D. Bohm and D. Pines, Physical Review <strong>82</strong>, 625 (1951).</p>
+<p>[2]&nbsp; D. Bohm and D. Pines, Physical Review <strong>92</strong>, 609 (1953).</p>
+<p>[3]&nbsp; J. Hubbard, Proceedings of the Royal Society of London. Series A. Mathematical and Physical Sciences <strong>240</strong>, 539 (1957).</p>
+<p>[4]&nbsp; D. C. Langreth and J. P. Perdew, Solid State Communications <strong>17</strong>, 1425 (1975).</p>
+<p>[5]&nbsp; F. Furche, Physical Review B <strong>64</strong>, 195120 (2001).</p>
+<p>[6]&nbsp; H. Jiang and E. Engel, The Journal of chemical physics <strong>127</strong>, 184108 (2007).</p>
+<p>[7]&nbsp; M. Fuchs and X. Gonze, Physical Review B <strong>65</strong>, 235109 (2002).</p>
+<p>[8]&nbsp; J. Harl and G. Kresse, Physical review letters <strong>103</strong>, 056401 (2009).</p>
+<p>[9]&nbsp; X. Ren, P. Rinke, and M. Scheffler, Physical Review B <strong>80</strong>, 045402 (2009).</p>
+<p>[10]&nbsp; F. Bruneval, Physical review letters <strong>108</strong>, 256403 (2012).</p>
+<p>[11]&nbsp; S. Leb&egrave;gue, J. Harl, T. Gould, J. &Aacute;ngy&aacute;n, G. Kresse, and J. Dobson, Physical review letters <strong>105</strong>, 196401 (2010).</p>
+<p>[12]&nbsp; X. Ren.</p>
+<p>[13]&nbsp; X. Ren, P. Rinke, C. Joas, and M. Scheffler, Journal of Materials Science <strong>47</strong>, 7447 (2012).</p>
+<p>[14]&nbsp; D. Pines, Reports on Progress in Physics <strong>79</strong>, 092501 (2016).</p>
+<p>[15]&nbsp; G. P. Chen, V. K. Voora, M. M. Agee, S. G. Balasubramani, and F. Furche, Annual review of physical chemistry <strong>68</strong>, 421 (2017).</p>
+<p>[16]&nbsp; R. J. Bartlett and M. Musiał, Reviews of Modern Physics <strong>79</strong>, 291 (2007).</p>
+<p>[17]&nbsp; B. Ramberger, T. Sch&auml;fer, and G. Kresse, Physical review letters <strong>118</strong>, 106403 (2017).</p>
+<p>[18]&nbsp; J. Harl and G. Kresse, Physical Review B <strong>77</strong>, 045136 (2008).</p>
+<p>[19]&nbsp; A. G&ouml;rling, Physical Review B <strong>99</strong>, 235120 (2019).</p>
+
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">VASP mpiifort 编译</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+
+<h2><b>phonopy</b></h2>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+unzip phonopy.zip
+下载spglib-1.16.1.tar.gz
+把这个安装包放到anaconda存放包的目录下，如:
+~/anaconda3/pkgs/ 这个目录下
+然后执行命令: conda install --use-local  spglib-1.16.1.tar.gz
+也可以tar -zxvf spglib-1.16.1.tar.gz
+cd spglib-1.16.1
+python setup.py install
+
+然后cd phonopy
+python setup.py install
+然后退出terminal重新进入
+which phonopy
+</code></pre>
+</div></div>
+
+<h2><b>wannier90编译</b></h2>
+<p>拓扑材料计算和GW计算需要用到wannier interpretation，建议安装</p>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+tar -zxvf wannier90-2.1.0.tar.gz /wannier90-2.1.0.tar.gz
+cd wannier90-2.1.0/wannier90-3.1.0
+cp ./config/make.inc.ifort ./make.inc
+vi make.inc
+"MKLROOT =/THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/mkl
+LIBDIR = $MKLROOT/lib/intel64"
+make all
+</code></pre>
+</div></div>
+
+<h2><b>vasp.6.2.0编译</b></h2>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+module load intel2020
+cp arch/makefile.include.linux_intel ./makefile.incule 
+vi makefile.include
+-DVASP2WANNIER90
+LLIBS += /your-wannier90-directory/libwannier.a
+MKLROOT=/intel/mkl
+</code></pre>
+</div></div>
+
+<h2><b>安装Intel compiler</b></h2>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; Intel编译器</p>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+./install.sh
+
+超算直接使用装好的就行:
+例如上海超算魔方3：
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+例如吕梁天河2号：
+
+which ifort
+which mpiifort
+</code></pre>
+</div></div>
+
+<h2><b>vasp.5.4.4编译</b></h2>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+tar -zxvf vasp.5.4.4.tar.gz
+tar -zxvf vasp.5.lib.tar.gz
+cd vasp.5.4.4
+下载http://cms.mpi.univie.ac.at/patches/patch.5.4.4.16052018.gz 并上传至vasp.5.4.4
+patch -p0 < patch.5.4.4.16052018
+cp arch/makefile.include.linux_intel ./makefile.incule 
+vi makefile.incule
+"
+# Precompiler options
+CPP_OPTIONS= -DHOST=\"LinuxIFC\"\
+             -DMPI -DMPI_BLOCK=8000 \
+             -Duse_collective \
+             -DscaLAPACK \
+             -DCACHE_SIZE=4000 \
+             -Davoidalloc \
+             -Duse_bse_te \
+             -Dtbdyn \
+             -Duse_shmem \
+             -DVASP2WANNIER90
+
+CPP        = fpp -f_com=no -free -w0  $*$(FUFFIX) $*$(SUFFIX) $(CPP_OPTIONS)
+FC         = mpiifort
+FCL        = mpiifort -mkl=sequential -lstdc++
+FREE       = -free -names lowercase
+FFLAGS     = -assume byterecl -w
+OFLAG      = -O2
+OFLAG_IN   = $(OFLAG)
+DEBUG      = -O0
+MKLROOT    =/THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/mkl
+MKL_PATH   = $(MKLROOT)/lib/intel64
+BLAS       = -L$(MKL_PATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
+LAPACK     = -L$(MKL_PATH) -lmkl_lapack95_lp64
+BLACS      = -lmkl_blacs_intelmpi_lp64
+SCALAPACK  = $(MKL_PATH)/libmkl_scalapack_lp64.a $(BLACS)
+OBJECTS    = fftmpiw.o fftmpi_map.o fft3dlib.o fftw3d.o
+INCS       =-I$(MKLROOT)/include/fftw
+LLIBS      = $(SCALAPACK) $(LAPACK) $(BLAS) 
+LLIBS      +=/THFS/home/gk_ahu_ljy/softwares/intel2018/wannier90-2.1.0/libwannier.a
+OBJECTS_O1 += fftw3d.o fftmpi.o fftmpiw.o
+OBJECTS_O2 += fft3dlib.o
+# For what used to be vasp.5.lib
+CPP_LIB    = $(CPP)
+FC_LIB     = $(FC)
+CC_LIB     = icc
+CFLAGS_LIB = -O
+FFLAGS_LIB = -O1
+FREE_LIB   = $(FREE)
+OBJECTS_LIB= linpack_double.o getshmem.o
+# For the parser library
+CXX_PARS   = icpc
+LIBS       += parser
+LLIBS      += -Lparser -lparser -lstdc++
+# Normally no need to change this
+SRCDIR     = ../../src
+BINDIR     = ../../bin
+
+#================================================
+# GPU Stuff
+CPP_GPU    = -DCUDA_GPU -DRPROMU_CPROJ_OVERLAP -DUSE_PINNED_MEMORY -DCUFFT_MIN=28 -UscaLAPACK
+OBJECTS_GPU = fftmpiw.o fftmpi_map.o fft3dlib.o fftw3d_gpu.o fftmpiw_gpu.o
+CC         = icc
+CXX        = icpc
+CFLAGS     = -fPIC -DADD_ -Wall -openmp -DMAGMA_WITH_MKL -DMAGMA_SETAFFINITY -DGPUSHMEM=300 -DHAVE_CUBLAS
+CUDA_ROOT  ?= /usr/local/cuda/
+NVCC       := $(CUDA_ROOT)/bin/nvcc -ccbin=icc
+CUDA_LIB   := -L$(CUDA_ROOT)/lib64 -lnvToolsExt -lcudart -lcuda -lcufft -lcublas
+GENCODE_ARCH    := -gencode=arch=compute_30,code=\"sm_30,compute_30\" \
+                   -gencode=arch=compute_35,code=\"sm_35,compute_35\" \
+                   -gencode=arch=compute_60,code=\"sm_60,compute_60\"
+MPI_INC    = $(I_MPI_ROOT)/include64/
+"
+make all
+</code></pre>
+</div></div>
+
+<h2><b>作业脚本</b></h2>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+#!/bin/bash
+source /THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/bin/compilervars.sh intel64
+source /THFS/opt/intel/parallel_studio_xe_2018_update2/impi/2018.2.199/intel64/bin/mpivars.sh intel64
+source /THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/mkl/bin/mklvars.sh intel64
+export vasprun=/THFS/home/gk_ahu_ljy/softwares/intel2018/vasp.5.4.4/bin/vasp_std
+yhrun -p gkxc -N 3 -n 72 $vasprun >>report&
+wait
+</code></pre>
+</div></div>
+
+<h2><b>FFTW编译</b></h2>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; FFT(Fast Fourier Transformation), 即为快速傅氏变换，是离散傅氏变换(Discrete Fourier Transform, DFT)的快速算法，它是根据离散傅氏变换的奇、偶、虚、实等特性，对离散傅立叶变换的算法进行改进获得的。
+离散傅里叶变换是傅里叶变换在时域和频域上都呈离散的形式,将信号的时域采样变换为其DTFT的频域采样。
+FFTW (the Faster Fourier Transform in the West)是一个快速计算离散傅里叶变换的标准C语言程序集，可用于计算一维或多维实和复数据以及任意规模的DFT。
+</p>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+wget http://www.fftw.org/fftw-3.3.8.tar.gz
+tar -zxvf fftw-3.3.8.tar.gz
+cd fftw-3.3.8
+编译双精度版本
+./configure --prefix=/public/home/users/shu001/software/fftw-3.3.8 CC=icc F77=ifort MPICC=mpiicc --enable-shared --enable-static --enable-mpi --enable-threads --enable-avx --enable-avx2 --enable-openmp
+make -j 8 
+make install
+编译单精度版本
+./configure --prefix=/public/home/users/shu001/software/fftw-3.3.8 CC=icc F77=ifort MPICC=mpiicc --enable-float --enable-sse --enable-shared --enable-static --enable-mpi --enable-threads --enable-avx --enable-avx2 --enable-openmp
+make -j 8 
+make install
+</code></pre>
+</div></div>
+
+
+
+</div>
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Quantum Espresso编译</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install libxc</b></h2>
+<pre class="highlight"><code>
+source /public4/soft/modules/module.sh
+module load intel/17.0.5-cjj-public4-public4
+
+./configure --prefix=/public4/home/sc56152/software/libxc-5.1.6 CC="icc -std=c11 -pedantic-errors" FC=ifort
+make -j 8
+make install
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install hdf5</b></h2>
+<pre class="highlight"><code>
+./configure --prefix=/public4/home/sc56152/software/hdf5-1.12.0 CC=mpiicc FC=mpiifort --enable-parallel --enable-fortran
+make
+make install
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install QE-6.8.0</b></h2>
+<pre class="highlight"><code>
+source /public4/soft/modules/module.sh
+module load intel/17.0.5-cjj-public4-public4
+export MKLROOT=/public4/soft/intel/2017/compilers_and_libraries_2017.5.239/linux/mkl
+
+./configure --prefix=/public4/home/sc56152/software/qe/6.8.0 MPIF90=mpiifort MPICC=mpiicc FC=ifort CC=icc F77=ifort --enable-parallel BLAS_LIBS="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" LAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" --with-hdf5="/public4/home/sc56152/software/hdf5-1.12.0" --with-libxc=yes --with-libxc-prefix="/public4/home/sc56152/software/libxc/5.1.6" LIBDIRS=/public4/home/sc56152/software/fftw/fftw-3.3.9/lib
+
+vi make.inc
+添加-D__DFTI for DFTI (Intel MKL library)
+添加-D__FFTW for internal fftw
+or 添加-D__FFTW3 for FFTW3 (external)
+IFLAGS添加-I/public4/home/sc56152/software/fftw/fftw-3.3.9/include
+make all -j 8
+FFT_LIBS=/public/software/compiler/intel/intel-compiler-2017.5.239/mkl/interfaces/fftw3xf/libfftw3xf_intel.a
+</code></pre>
+</div></div>
+
+
+
+<h2><b>FFTW编译</b></h2>
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<pre class="highlight"><code>
+wget http://www.fftw.org/fftw-3.3.8.tar.gz
+tar -zxvf fftw-3.3.8.tar.gz
+cd fftw-3.3.8
+编译双精度版本
+./configure --prefix=/public/home/users/shu001/software/fftw-3.3.8 CC=icc F77=ifort MPICC=mpiicc --enable-shared --enable-static --enable-mpi --enable-threads --enable-avx --enable-avx2 --enable-openmp
+make -j 8 
+make install
+编译单精度版本
+./configure --prefix=/public/home/users/shu001/software/fftw-3.3.8 CC=icc F77=ifort MPICC=mpiicc --enable-float --enable-sse --enable-shared --enable-static --enable-mpi --enable-threads --enable-avx --enable-avx2 --enable-openmp
+make -j 8 
+make install
+</code></pre>
+</div></div>
+
+
+
+
+
+<h2><b>上海超算魔方3环境变量</b></h2>
+<pre class="highlight"><code>
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>hdf1.12编译</b></h2>
+<pre class="highlight"><code>
+cd hdf5-1.12.0
+mkdir install_dir
+./configure --prefix=/public/home/users/shu002/software/hdf5-1.12.0/install_dir CC=mpiicc FC=mpiifort --enable-parallel --enable-fortran --enable-shared
+make all install
+</code></pre>
+</div></div>
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Libxc5.0编译</b></h2>
+<pre class="highlight"><code>
+./configure CC=icc FC=ifort --prefix=/THFS/home/gk_ahu_ljy/softwares/libxc-4.3.4
+make 
+make install
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install QE-6.6</b></h2>
+<pre class="highlight"><code>
+export MKLROOT=/public/software//compiler/intel/intel-compiler-2017.5.239/mkl
+
+./configure --prefix=/public/home/users/shu001/software/qe/qe-6.6 
+ MPIF90=mpiifort F90=ifort CC=icc --enable-parallel 
+BLAS_LIBS="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" 
+LAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+FFT_LIBS=/public/software/compiler/intel/intel-compiler-2017.5.239/mkl/interfaces/fftw3xf/libfftw3xf_intel.a
+
+
+vi make.inc
+添加-D DFTI for DFTI (Intel MKL library)
+make all
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install QE-6.5</b></h2>
+<pre class="highlight"><code>
+export MKLROOT=/public/software//compiler/intel/intel-compiler-2017.5.239/mkl
+
+./configure --prefix=/public/home/users/shu001/software/qe/qe-6.5 
+ MPIF90=mpiifort F90=ifort CC=icc --enable-parallel --with-scalapack="intel"
+ BLAS_LIBS="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" 
+LAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+FFT_LIBS=/public/software/compiler/intel/intel-compiler-2017.5.239/mkl/interfaces/fftw3xf/libfftw3xf_intel.a
+--with-hdf5="/public/home/users/shu001/software/hdf5-1.10.5" 
+--with-libxc=yes --with-libxc-prefix=/public/home/users/shu001/software/libxc-4.3.4 
+--with-libxc-include=/public/home/users/shu001/software/libxc-4.3.4/include
+vi make.inc
+在LD_LIBS=添加libxc/lib的路径
+
+make all
+
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Libxc-4.3.4编译</b></h2>
+<pre class="highlight"><code>
+./configure CC=icc FC=ifort --prefix=/THFS/home/gk_ahu_ljy/softwares/libxc-4.3.4
+make 
+make install
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install qe-6.4.1</b></h2>
+<pre class="highlight"><code>
+export MKLROOT=/public/software//compiler/intel/intel-compiler-2017.5.239/mkl
+
+./configure --prefix=/public/home/users/shu001/software/qe-6.4.1 FC=ifort CC=icc MPIF90=mpiifort 
+--enable-parallel --with-scalapack="intel"  
+BLAS_LIBS="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64" 
+LAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+FFT_LIBS=/public/software/compiler/intel/intel-compiler-2017.5.239/mkl/interfaces/fftw3xf/libfftw3xf_intel.a 
+--with-libxc="yes" --with-libxc-prefix="/public/home/users/shu001/software/libxc-4.3.4/" 
+--with-libxc-include="/public/home/users/shu001/software/libxc-4.3.4/include" 
+
+
+vi make.inc
+添加$MKLROOT/include/fftw 到IFLAGS后面
+</code></pre>
+</div></div>
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>Install QE</b></h2>
+<pre class="highlight"><code>
+export MKLROOT=/THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/mkl
+
+./configure --prefix=/THFS/home/gk_ahu_ljy/softwares/qe-6.4.1/2018 FC=ifort CC=icc MPIF90=mpiifort 
+--enable-parallel --with-scalapack="intel" --with-libxc="yes"
+--with-libxc-prefix="/THFS/home/gk_ahu_ljy/softwares/libxc-4.3.4" 
+--with-libxc-include="/THFS/home/gk_ahu_ljy/softwares/libxc-4.3.4/include" 
+BLAS_LIBS="-L$MKLROOT/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core" 
+SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64"
+LAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_lapack95_lp64" 
+FFT_LIBS=/THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/mkl/interfaces/fftw3xf/libfftw3xf_intel.a
+make all
+
+赝势下载：<a href="https://www.quantum-espresso.org/pseudopotentials">https://www.quantum-espresso.org/pseudopotentials</a>
+参数注释：<a href="https://www.quantum-espresso.org/Doc/INPUT_PW.html">https://www.quantum-espresso.org/Doc/INPUT_PW.html</a>
+计算例子：<a href="https://gitlab.com/QEF/q-e/tree/master/PW/examples">https://gitlab.com/QEF/q-e/tree/master/PW/examples</a>
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>吕梁环境变量</b></h2>
+<pre class="highlight"><code>
+source /THFS/opt/intel/parallel_studio_xe_2018_update2/compilers_and_libraries_2018.2.199/linux/bin/ifortvars.sh intel64
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

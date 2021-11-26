@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <style>
+            .table{
+                border: 1px solid #ccc;
+                border-collapse: collapse;
+                text-align: center;
+            }
+            .tr,th,td{
+                width: 80px;
+                height: 30px;
+                border: 1px solid #ccc;
+            }
+		    .lan1{
+              float:left;
+              width:150px;
+              background: ;
+              height:500px;
+            }
+            .lan2{
+              margin-left:150px;
+              background: ;
+              height:500px;
+            }
+
+        </style>
+    </head>
+    <body>
+	
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>	
+
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Si relaxation</h2></center>
+				</header>
+				
+<div class="lan1"></div>
+<div class="lan2">
+
+Relaxation of the internal coordinates of a perturbed cd Si structure.
+<div class="highlight">
+<h2><b>POSCAR</b></h2>
+<pre class="highlight"><code>
+Si
+1.0
+        3.8401000500         0.0000000000         0.0000000000
+        1.9200500250         3.3256241964         0.0000000000
+        1.9200500250         1.1085413988         3.1354285612
+   Si
+    2
+Direct
+     0.000000000         0.000000000         0.000000000
+     0.250000000         0.250000000         0.250000000
+</code></pre>
+</div>
+Break of symmetry in standard diamond structure: change z position from 0.125 to 0.130.
+<br>Converting to the format of QE.
+
+<div class="highlight">
+<h2><b>structure</b></h2>
+<pre class="highlight"><code>
+CELL_PARAMETERS angstrom
+    0.0000000000000000   2.5000000000000000   2.5000000000000000
+    2.5000000000000000   0.0000000000000000   2.5000000000000000
+    2.5000000000000000   2.5000000000000000   0.0000000000000000
+ATOMIC_SPECIES
+Si    28.086    Si.UPF
+ATOMIC_POSITIONS crystal
+Si    -0.1250000000000000  -0.1250000000000000  -0.1250000000000000
+Si    0.1250000000000000  0.1250000000000000  0.1300000000000000
+
+</code></pre>
+</div>
+
+calculation = ‘vc-relax’: allow cell to be relaxed.
+calculation = ‘relax’: only relax the atomic positions。
+<div class="highlight">
+<h2><b>input</b></h2>
+<pre class="highlight"><code>
+&CONTROL
+  calculation = "vc-relax",
+  pseudo_dir  = '/public/home/users/shu003/pseudo_QE',
+  prefix      = 'pwscf',
+  outdir      = './tmp',
+  verbosity='high', tprnfor=.true., tstress=.true., forc_conv_thr=1.0d-5,
+  nstep=50
+/
+&SYSTEM
+  ibrav       = 0,
+  ntyp        = 1,
+  nat         = 2,
+  ecutwfc     = 30.D0,
+  occupations = "smearing",
+  smearing    = "gaussian",
+  degauss     = 0.0005
+/
+&ELECTRONS
+  electron_maxstep = 30
+  conv_thr    = 1.D-6,
+  mixing_mode = 'plain',
+  mixing_beta = 0.8d0,
+  diagonalization = 'david'
+/
+&IONS
+  ion_dynamics      = 'bfgs',
+/
+&CELL
+  press_conv_thr=0.1,cell_dofree='all'
+/
+CELL_PARAMETERS angstrom
+    0.0000000000000000   2.5000000000000000   2.5000000000000000
+    2.5000000000000000   0.0000000000000000   2.5000000000000000
+    2.5000000000000000   2.5000000000000000   0.0000000000000000
+ATOMIC_SPECIES
+Si    28.086    Si.UPF
+ATOMIC_POSITIONS crystal
+Si    -0.1250000000000000  -0.1250000000000000  -0.1250000000000000
+Si    0.1250000000000000  0.1250000000000000  0.1300000000000000
+K_POINTS {automatic}
+6 6 6 0 0 0
+
+</code></pre>
+</div>
+mpirun $PW_EXEC -nk 4 < input > ./report
+<br>rm pwscf.wfc*
+<br>rm pwscf.save/wfc*
+<br>
+<br>
+<br>
+check the energy convergence:
+<br>   grep "!    total energy" report
+<br>
+<br>
+awk  '/Begin final coordinates/,/End final coordinates/{print $0}' report
+
+ 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</div>
+</div>
+</main>
+
+
+</body>
+</html>

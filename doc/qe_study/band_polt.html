@@ -1,0 +1,356 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Quantum Espresso实例</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+<p>QE的输入文件逻辑比VASP要复杂一些，有时显得不够优雅（例如：原子质量），优点是让你多思考，但对于不熟练的选手的使用成本会较高。
+它本身的开源性、优秀的性能，丰富的interfaces让人respect。</p>
+<p>搭配软件：
+<br>可视化晶格：VESTA，Materials studio (内置的晶格转化,find symmetry, find k-path etc.)
+<br>k-path: http://www.cryst.ehu.es/cryst/get_kvec.html
+它自身提供了的后处理程序，例如bands.x, dos.x，不过比较尴尬的是它后处理玩的数据，并不直接试用于origin画图。
+另外，它的能带k-path，默认单位制也不是很friendly。
+</p>
+<h3>Case 1</h3>
+mkdir case1
+<br>cd case1
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>run_example01</b></h2>
+<pre class="highlight"><code>
+#!/bin/sh
+#BSUB -q snode
+#BSUB -n 32
+#BSUB -R "span[ptile=32]"
+#BSUB –o %J.out
+#BSUB –e %J.err
+#Environment
+. /public/home/users/app/compiler/intel-2017.8/compilers_and_libraries_2017.8.262/linux/bin/compilervars.sh intel64
+CURDIR=$PWD
+rm -f nodelist >& /dev/null
+for host in `echo $LSB_HOSTS`
+do
+   echo $host >> nodelist
+done
+NP=`cat nodelist |wc -l`
+export qerun=/public/home/users/shu001/software/qe-6.4.1/bin/pw.x
+mkdir TMP_DIR
+
+for diago in david; do
+    # self-consistent calculation
+    cat > si.scf.$diago.in << EOF
+ &control
+    calculation = 'scf'
+    restart_mode='from_scratch',
+    prefix='silicon',
+    tstress = .true.
+    tprnfor = .true.
+    pseudo_dir = '/public/home/users/shu001/software/qe-6.4.1/pseudo/',
+    outdir='./TMP_DIR/'
+ /
+ &system
+    ibrav=  2, celldm(1) =10.20, nat=  2, ntyp= 1,
+    ecutwfc =18.0,
+ /
+ &electrons
+    diagonalization='$diago'
+    mixing_mode = 'plain'
+    mixing_beta = 0.7
+    conv_thr =  1.0d-8
+ /
+ATOMIC_SPECIES
+ Si  28.086  Si_ONCV_PBE-1.1.upf
+ATOMIC_POSITIONS alat
+ Si 0.00 0.00 0.00
+ Si 0.25 0.25 0.25
+K_POINTS
+  10
+   0.1250000  0.1250000  0.1250000   1.00
+   0.1250000  0.1250000  0.3750000   3.00
+   0.1250000  0.1250000  0.6250000   3.00
+   0.1250000  0.1250000  0.8750000   3.00
+   0.1250000  0.3750000  0.3750000   3.00
+   0.1250000  0.3750000  0.6250000   6.00
+   0.1250000  0.3750000  0.8750000   6.00
+   0.1250000  0.6250000  0.6250000   3.00
+   0.3750000  0.3750000  0.3750000   1.00
+   0.3750000  0.3750000  0.6250000   3.00
+EOF
+    echo "  running the scf calculation for Si...\c"
+	mpirun -np $NP -machinefile $CURDIR/nodelist $qerun < si.scf.$diago.in > si.scf.$diago.out
+
+    # band structure calculation along delta, sigma and lambda lines
+    cat > si.band.$diago.in << EOF
+ &control
+    calculation='bands'
+    pseudo_dir = '/public/home/users/shu001/software/qe-6.4.1/pseudo/',
+    outdir='./TMP_DIR/',
+    prefix='silicon'
+ /
+ &system
+    ibrav=  2, celldm(1) =10.20, nat=  2, ntyp= 1,
+    ecutwfc =18.0, nbnd = 8,
+ /
+ &electrons
+    diagonalization='$diago'
+ /
+ATOMIC_SPECIES
+ Si  28.086  Si_ONCV_PBE-1.1.upf
+ATOMIC_POSITIONS alat
+ Si 0.00 0.00 0.00
+ Si 0.25 0.25 0.25
+K_POINTS
+ 28
+   0.0 0.0 0.0 1.0
+   0.0 0.0 0.1 1.0
+   0.0 0.0 0.2 1.0
+   0.0 0.0 0.3 1.0
+   0.0 0.0 0.4 1.0
+   0.0 0.0 0.5 1.0
+   0.0 0.0 0.6 1.0
+   0.0 0.0 0.7 1.0
+   0.0 0.0 0.8 1.0
+   0.0 0.0 0.9 1.0
+   0.0 0.0 1.0 1.0
+   0.0 0.0 0.0 1.0
+   0.0 0.1 0.1 1.0
+   0.0 0.2 0.2 1.0
+   0.0 0.3 0.3 1.0
+   0.0 0.4 0.4 1.0
+   0.0 0.5 0.5 1.0
+   0.0 0.6 0.6 1.0
+   0.0 0.7 0.7 1.0
+   0.0 0.8 0.8 1.0
+   0.0 0.9 0.9 1.0
+   0.0 1.0 1.0 1.0
+   0.0 0.0 0.0 1.0
+   0.1 0.1 0.1 1.0
+   0.2 0.2 0.2 1.0
+   0.3 0.3 0.3 1.0
+   0.4 0.4 0.4 1.0
+   0.5 0.5 0.5 1.0
+EOF
+    echo "  running the band-structure calculation for Si...\c"
+	mpirun -np $NP -machinefile $CURDIR/nodelist $qerun < si.band.$diago.in > si.band.$diago.out
+
+done
+</code></pre>
+</div></div>
+<p>bsub<run_example01</p>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>bands.inp</b></h2>
+<pre class="highlight"><code>
+&bands
+prefix='pwscf',
+outdir='./'
+filband='bd.dat'
+/
+</code></pre>
+</div></div>
+<p>bands.x < bands.inp > bands.out</p>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>plotband.in</b></h2>
+<pre class="highlight"><code>
+band.dat  #input band.dat
+-5 5
+GaSe_band.dat  #output band.dat
+GaSe_band.eps  #output figure
+-3.6511  #Fermi level
+1.0 -3.6511   #Axis interval, Energy shift
+</code></pre>
+</div></div>
+<p>plotband.x < plotband.in >plot.out </p>
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b> </b></h2>
+<pre class="highlight"><code>
+Wannier90: Execution started on 22Oct2018 at 17:08:45
+Exiting.......
+param_get_projection: too many projections defined
+</code></pre>
+</div></div>
+这是在计算wannier的时候遇到的报错，是因为投影轨道忘了乘以原子数。
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>in.win mp_grid 6 6 1</b></h2>
+<pre class="highlight"><code>
+~/software/vasp/wannier90-2.1.0/utility/kmesh.pl 6 6 6
+</code></pre>
+</div></div>
+refer Quantum Espresso报错指南
+https://www.jianshu.com/p/ee01b499ce25
+
+forrtl: severe (174): SIGSEGV, segmentation fault occurred
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>bands.x -npool 4 <bands.inp> out </b></h2>
+<pre class="highlight"><code>
+forrtl: severe (174): SIGSEGV, segmentation fault occurred
+</code></pre>
+</div></div>
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>pwscf.win</b></h2>
+<pre class="highlight"><code>
+num_bands         =   64
+num_wann          =   32
+#exclude_bands = 1-2
+
+#-- Disentanglement parameters
+DIS_WIN_MIN     =  -21.0
+DIS_FROZ_MIN    =  -21.0
+DIS_FROZ_MAX    =    3.1
+DIS_WIN_MAX     =    8.0
+DIS_NUM_ITER    =  300
+DIS_MIX_RATIO   =  0.3
+DIS_CONV_TOL    =  1.0D-14
+DIS_CONV_WINDOW =  5
+
+#-- Wannierisation parameters
+NUM_ITER               = 500
+NUM_CG_STEPS           = 20
+CONV_TOL               = 5.0D-7
+CONV_WINDOW            = 10
+NUM_DUMP_CYCLES        = 100
+NUM_PRINT_CYCLES       = 5
+WRITE_R2MN             = F
+GUIDING_CENTRES        = F
+NUM_GUIDE_CYCLES       = 10
+NUM_NO_GUIDE_ITER      = 10
+
+Begin Projections
+C : sp3
+B : sp3
+End Projections
+
+Begin Unit_Cell_Cart
+Bohr
+  9.7618982096	0.0000000000	0.0000000000	
+  4.8809491048	8.4540518387	0.0000000000	
+  0.0000000000	0.0000000000	37.7945197800	
+End Unit_Cell_Cart
+Begin Atoms_Frac
+ C     0.5079420685835356 -0.0158841371670711  0.5000000000000000
+ C    -0.0158841371670711  0.5079420685835356  0.5000000000000000
+ C     0.5079420685835356  0.5079420685835356  0.5000000000000000
+ C     0.8253912647498001  0.3492174705004068  0.5000000000000000
+ C     0.3492174705004069  0.8253912647498001  0.5000000000000000
+ C     0.8253912647498001  0.8253912647498001  0.5000000000000000
+ B    -0.0000000000000000  0.0000000000000000  0.5000000000000000
+ B     0.3333333333333357  0.3333333333333357  0.5000000000000000
+End Atoms_Frac
+
+mp_grid      = 6 6 1
+
+bands_plot = .true.
+begin kpoint_path
+G 0.0000000000  0.0000000000  0.0000 M 0.0000000000  0.5000000000  0.0000
+M 0.0000000000  0.5000000000  0.0000 K 0.3333333333  0.6666666667  0.0000
+K 0.3333333333  0.6666666667  0.0000 G 0.0000000000  0.0000000000  0.0000
+end kpoint_path
+BANDS_NUM_POINTS = 51
+
+begin kpoints
+0.0000000000	0.0000000000	0.0000000000	
+0.0000000000	0.1666666667	0.0000000000	
+0.0000000000	0.3333333333	0.0000000000	
+0.0000000000	0.5000000000	0.0000000000	
+0.0000000000	0.6666666667	0.0000000000	
+0.0000000000	0.8333333333	0.0000000000	
+0.1666666667	0.0000000000	0.0000000000	
+0.1666666667	0.1666666667	0.0000000000	
+0.1666666667	0.3333333333	0.0000000000	
+0.1666666667	0.5000000000	0.0000000000	
+0.1666666667	0.6666666667	0.0000000000	
+0.1666666667	0.8333333333	0.0000000000	
+0.3333333333	0.0000000000	0.0000000000	
+0.3333333333	0.1666666667	0.0000000000	
+0.3333333333	0.3333333333	0.0000000000	
+0.3333333333	0.5000000000	0.0000000000	
+0.3333333333	0.6666666667	0.0000000000	
+0.3333333333	0.8333333333	0.0000000000	
+0.5000000000	0.0000000000	0.0000000000	
+0.5000000000	0.1666666667	0.0000000000	
+0.5000000000	0.3333333333	0.0000000000	
+0.5000000000	0.5000000000	0.0000000000	
+0.5000000000	0.6666666667	0.0000000000	
+0.5000000000	0.8333333333	0.0000000000	
+0.6666666667	0.0000000000	0.0000000000	
+0.6666666667	0.1666666667	0.0000000000	
+0.6666666667	0.3333333333	0.0000000000	
+0.6666666667	0.5000000000	0.0000000000	
+0.6666666667	0.6666666667	0.0000000000	
+0.6666666667	0.8333333333	0.0000000000	
+0.8333333333	0.0000000000	0.0000000000	
+0.8333333333	0.1666666667	0.0000000000	
+0.8333333333	0.3333333333	0.0000000000	
+0.8333333333	0.5000000000	0.0000000000	
+0.8333333333	0.6666666667	0.0000000000	
+0.8333333333	0.8333333333	0.0000000000	
+End Kpoints
+</code></pre>
+</div></div>
+
+</div>
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

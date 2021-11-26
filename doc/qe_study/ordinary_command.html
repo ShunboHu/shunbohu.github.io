@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <style>
+            .table{
+                border: 1px solid #ccc;
+                border-collapse: collapse;
+                text-align: center;
+            }
+            .tr,th,td{
+                width: 80px;
+                height: 30px;
+                border: 1px solid #ccc;
+            }
+		    .lan1{
+              float:left;
+              width:150px;
+              background: ;
+              height:500px;
+            }
+            .lan2{
+              margin-left:150px;
+              background: ;
+              height:500px;
+            }
+
+        </style>
+    </head>
+    <body>
+	
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>	
+
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Ordinary_command</h2></center>
+				</header>
+				
+<div class="lan1"></div>
+<div class="lan2">
+
+
+mpirun $PW_EXEC -nk 4 < input > ./report
+<br>rm pwscf.wfc*
+<br>rm pwscf.save/wfc*
+<br><b>check the energy convergence:</b>
+<br>   grep "!    total energy" report
+<br><b>get contcar</b>
+<br>awk  '/Begin final coordinates/,/End final coordinates/{print $0}' report
+
+ 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</div>
+</div>
+</main>
+
+
+</body>
+</html>

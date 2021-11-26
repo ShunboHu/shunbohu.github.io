@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; VASP编译openmpi</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+	
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install gcc</b></h2>
+<pre class="highlight"><code>
+tar xzvf gcc-9.2.0.tar.gz 
+cd gcc-9.2.0/
+#下载编译所需的依赖包
+./contrib/download_prerequisites
+mkdir build-gcc-9.2.0
+cd build-gcc-9.2.0/
+../configure --disable-multilib --prefix=/home/../gcc-9.2.0
+make -j4
+make install
+export PATH=/home/../gcc-9.2.0/bin:$PATH
+export LD_LIBRARY_PATH=/home/../gcc-9.2.0/lib64:$LD_LIBRARY_PATH
+which gcc
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install gcc</b></h2>
+<pre class="highlight"><code>
+tar xzvf gcc-9.2.0.tar.gz 
+cd gcc-9.2.0/
+#下载编译所需的依赖包
+联网情况下：./contrib/download_prerequisites
+verify报错或断网情况，手动下载和安装：
+从 ftp://gcc.gnu.org/pub/gcc/infrastructure/
+下载gmp-6.1.0.tar.bz2  isl-0.18.tar.bz2  mpc-1.0.3.tar.gz  mpfr-3.1.4.tar.bz2
+将它们解压到gcc-9.2.0目录下
+cd mpc-1.0.3
+./configure --prefix=$path_of_mpc-1.0.3
+make 
+make install
+依次安装gmp mpfr
+安装isl
+export LOCAL_LIBS=/public/home/users/shu001/local/
+mkdir $LOCAL_LIBS
+export PATH=$LOCAL_LIBS/bin:$LOCAL_LIBS/usr/local/bin/:$PATH
+
+cd isl-0.18
+./configure --prefix=$LOCAL_LIBS --with-gmp-prefix=/public/home/users/shu001/software/gcc-9.2.0/gmp-6.1.0 --disable-multilib
+
+mkdir build-gcc-9.2.0
+cd build-gcc-9.2.0/
+../configure --disable-multilib --prefix=/public/home/users/shu001/software/gcc-9.2.0/build-gcc-9.2.0 
+--with-gmp=../gmp-6.1.0 --with-mpfr=../mpfr-3.1.4 --with-mpc=../mpc-1.0.3 --with-isl=../isl-0.18
+make -j4
+make install
+export PATH=/home/../gcc-9.2.0/bin:$PATH
+export LD_LIBRARY_PATH=/home/../gcc-9.2.0/lib64:$LD_LIBRARY_PATH
+which gcc
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install openmpi</b></h2>
+<pre class="highlight"><code>
+tar xzvf openmpi-4.0.2.tar.gz 
+cd openmpi-4.0.2/
+./configure --prefix="your path" CC=gcc FC=gfortran CXX=g++
+make -j4
+make install
+export PATH=/home/.../openmpi-4.0.2/bin:$PATH
+export LD_LIBRARY_PATH=/home/.../openmpi-4.0.2/lib:$LD_LIBRARY_PATH
+</code></pre>
+</div></div>
+
+
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install OpenBLAS-0.3.7</b></h2>
+<pre class="highlight"><code>
+tar -zxvf OpenBLAS-0.3.7.tar.gz
+cd OpenBLAS-0.3.7
+make CC=gcc FC=gfortran
+make PREFIX="your path" install
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install lapack-3.9.0 </b></h2>
+<pre class="highlight"><code>
+tar -zxvf lapack-3.9.0.tar.gz
+cp make.inc.example make.inc
+make
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install scalapack</b></h2>
+<pre class="highlight"><code>
+wget http://www.netlib.org/scalapack/scalapack_installer.tgz
+./setup.py --prefix="your path" --downall
+如果报错：
+IOError: [Errno 2] No such file or directory: 'download/./scalapack.tgz'
+则使用安装包安装
+tar -zxvf scalapack-2.1.tar.gz
+cd scalapack-2.1/
+cp SLmake.inc.example SLmake.inc
+make
+cd ~/scalapack-2.1/BLACS/SRC
+make CC=gcc FC=gfortran
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install fftw</b></h2>
+<pre class="highlight"><code>
+tar -zxvf fftw-3.3.8.tar.gz 
+cd fftw-3.3.8
+./configure --prefix=/public1/home/sc50037/fftw-3.3.8 CC=gcc FC=gfortran MPICC=mpicc F77=mpif77  --enable-mpi  --enable-openmp  --enable-threads
+make 
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>install vasp.5.4.4</b></h2>
+<pre class="highlight"><code>
+tar -zxvf cd vasp.5.lib.tar.gz
+tar -zxvf cd vasp.5.4.4.tar.gz
+cd vasp.5.lib
+cp makefile.linux_gfortran Makefile
+make
+cd ../vasp.5.4.4
+cp arch/makefile.include.linux_gnu makefile.include
+
+vi makefile.include
+BLAS       = -L$(/public1/home/../lapack-3.9.0) -lrefblas
+LAPACK     = -L$(/public1/home/../lapack-3.9.0) -ltmglib -llapack
+BLACS      =
+SCALAPACK  = -L$(/public1/home/sc50037/scalapack-2.1) -lscalapack $(BLACS)
+
+LLIBS      = $(SCALAPACK) $(LAPACK) $(BLAS)
+
+FFTW       = /public1/home/sc50037/fftw-3.3.8
+LLIBS      += -L$(FFTW)/lib -lfftw3
+INCS       = -I$(FFTW)/include
+
+错误1：
+BLAS       = -L$(/public1/home/../OpenBLAS-0.3.7) -lopenblas
+/usr/bin/ld: warning: libgfortran.so.3, needed by /lib/../lib64/liblapack.so, may conflict with libgfortran.so.5
+scala.o: In function `__scala_MOD_recon_slice_herm':
+scala.f90:(.text+0x153): undefined reference to `blacs_gridinfo_'
+scala.f90:(.text+0x16e): undefined reference to `numroc_'
+scala.f90:(.text+0x18d): undefined reference to `numroc_'
+scala.o: In function `__scala_MOD_recon_slice_c':
+
+错误2：
+BLAS       = -L$(/public1/home/../lapack-3.9.0) -lrefblas
+
+
+/usr/bin/ld: nonlr.o: undefined reference to symbol 'dgemm_'
+//usr/lib64/libblas.so.3: error adding symbols: DSO missing from command line
+collect2: error: ld returned 1 exit status
+</code></pre>
+</div></div>
+
+</div>
+
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

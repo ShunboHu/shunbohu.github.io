@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../assets/css/katex.min.css" />
+		<script src="../assets/js/katex.min.js"></script>
+		<script src="../assets/js/auto-render.js"></script>	
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">&nbsp; Berkeley GW学习笔记</h2></center>
+				</header>
+				
+<section class="wrapper style1 align-left">
+<div class="inner">
+
+<p>DFT在预测结构性质时常表现良好，但是在预测band gap上不尽如人意。
+对于这类与激发态相关的性质，更严格的处理应该是在多体微扰理论(MBPT)的框架下进行。</p>
+
+
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>kgrid.inp</b></h2>
+<pre class="highlight"><code>
+ nk1 nk2 nk3   !   numbers of k-points in crystal coordinates (b1,b2,b3)
+ dk1 dk2 dk3   !   k-grid offset (0.0 unshifted, 1.0 shifted by bj/nkj)
+ dq1 dq2 dq3   !   a small q-shift (0.0 unshifted, 1.0 shifted by bj)
+
+ a1x a1y a1z   !   lattice vectors in Cartesian coordinates (x,y,z)
+ a2x a2y a2z   !   in arbitrary units (bohr, angstrom, lattice parameter)
+ a3x a3y a3z   !
+ n             !   number of atoms in the unit cell
+ s1 x1 y1 z1   !   atomic species and positions in Cartesian coordinates (x,y,z)
+ ...........   !   in the same units as the lattice vectors
+ sn xn yn zn   !
+ nr1 nr2 nr3   !   size of FFT grid
+ trs           !   if set to .true., use time-reversal symmetry (do not use this for BerkeleyGW)
+ Cartesian     !   OPTIONAL: set to .true. for k-points in Cartesian coordinates (only in the log file)
+ octopus       !   OPTIONAL: set to .true. to write output file in format suitable for Octopus
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>ERROR: Selected number	of	bands	breaks	degenerate	subspace.</b></h2>
+<pre class="highlight"><code>
+degeneracy_check.x WFN
+</code></pre>
+</div></div>
+
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<h2><b>From proc 0: ERROR: insufficient number of k-point blocks in file eqp_co.dat</b></h2>
+很可能epsilon.inp 的number_qpoints 或sigma.inp 的number_kpoints数错了，这一报错常见于Berkeley GW1.1.
+建议使用Berkeley GW2.1版本的inteqp.real.x
+<pre class="highlight"><code>
+
+</code></pre>
+</div></div>
+
+/public/home/users/shu001/software/vasp/wannier90-2.1.0/utility/kmesh.pl 6 6 6
+
+bands_num_points = 51
+exclude_bands 1-64
+
+# GW energy window for t2g states
+dis_win_min = 7.4
+dis_win_max = 9.95
+
+
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
+

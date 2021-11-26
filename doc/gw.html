@@ -1,0 +1,448 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Fanhao Jia</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+		<script type="text/x-mathjax-config">  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--<script id="MathJax-script" async src="../assets/js/tex-mml-chtml.js"></script>-->
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    </head>
+  
+<body>
+    <nav >
+        <div class="container"> 
+            <div class="navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="https://fanhaojia.github.io/#note"><b>主页Home</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>			
+    </nav>
+	
+<main id="main">
+    <div class="content inner">
+				<header class="page-header">
+					<center><h2 class="page-title">GW近似</h2></center>
+				</header>
+
+
+<section class="wrapper style1 align-left">
+<div class="inner">
+<div class="language-plaintext highlighter-rouge">
+<div class="highlight">
+<p><strong>GW</strong><strong>方法</strong></p>
+<p>前面介绍的DFT和RPA属于研究材料基态性质的方法，然而许多情况下，我们需要研究激发态性质，例如光吸收和电荷载流子输运等。GW近似是一种发展很好的描述单粒子激发态的方法。从Hedin方程出发，我们可以把准粒子自能&sum;扩展到一系列的库仑屏蔽势W，并且只取最低阶项，来得到准粒子自能的近似。该方法于1965年由Hedin提出[1]，但是第一个真实材料计算则直到1980年代高性能计算机的出现才被实现。</p>
+<p>第一原理计算单粒子激发态的方法主要包含以下两个步骤：</p>
+<p>(1) 利用平均场近似方法计算基态波函数和能量，如DFT或者HF方法。</p>
+<p>(2) 从基态波函数出发，通过GW近似将准粒子自能作为微扰计算。</p>
+<ol>
+<li>多体系统的格林函数</li>
+</ol>
+<p>Green&rsquo;s function方法是求解常微分方程和偏微分方程常用的方法，以求解Poisson方程为例</p>
+$$\mathrm{\nabla}^2\phi\left(\vec{r}\right)=-\frac{1}{\varepsilon_0}\rho_e\left(\vec{r}\right)$$
+<p>引入相关的简单微分方程：</p>
+$$\mathrm{\nabla}_{\vec{r}}G\left(\vec{r}\right)=\delta\left(\vec{r}\right)$$
+<p>这里\(G\left(\vec{r}\right)\)是Laplace算符\(\mathrm{\nabla}_{\vec{r}}\)的Green&rsquo;s function, 有</p>
+$$\phi\left(\vec{r}\right)=-\frac{1}{\varepsilon_0}\int r d{\vec{r}}^\prime G\left(\vec{r}-{\vec{r}}^\prime\right)\rho_e\left({\vec{r}}^\prime\right)$$
+<p>对\(G\left(\vec{r}\right)\)做Fourier变换\(-k^2G\left(\vec{k}\right)=1\Rightarrow G\left(\vec{k}\right)=-\frac{1}{k^2}\)，有</p>
+$$
+G\left(\vec{r}\right)=\int\frac{\mathrm{d}\vec{r}}{\left(2\pi\right)^3}\mathrm{e}^{\mathrm{i}\vec{\mathrm{k}}\mathrm{\cdot} \vec{\mathrm{r}}}G\left(\vec{k}\right)=-\int\frac{\mathrm{d}\vec{k}}{\left(2\pi\right)^3}\frac{\mathrm{e}^{\mathrm{i}\vec{\mathrm{k}}\mathrm{\cdot} \vec{\mathrm{r}}}}{k^2}=-\frac{1}{4\pi r}
+$$
+<p>因此我们解得：</p>
+$$
+\phi\left(\vec{r}\right)=\frac{1}{4\pi\varepsilon_0}\int r d{\vec{r}}^\prime\frac{\rho_e\left({\vec{r}}^\prime\right)}{\left|\vec{r}-{\vec{r}}^\prime\right|}
+$$
+<p>可以看到Green&rsquo;s function只是求解过程的一个中间桥梁。</p>
+<p>Green&rsquo;s function求解单粒子Schr&ouml;dinger方程：</p>
+$$
+\left[H_0\left(\vec{r}\right)+V\left(\vec{r}\right)\right]\mathrm{\Psi}_E=E\mathrm{\Psi}_E
+$$
+<p>如果已知H<sub>0</sub>的本征态，而将V视作微扰(对应于散射图像，一束H<sub>0</sub>粒子被V散射后，粒子将处于不同的出射状态)。为求解Schr&ouml;dinger方程，定义Green&rsquo;s function相关的微分方程：</p>
+$$
+\left[E-H_0\left(\vec{r}\right)\right]G_0\left(\vec{r},{\vec{r}}^\prime;E\right)=\delta\left(\vec{r}-{\vec{r}}^\prime\right)
+$$
+<p>有边界条件\(G_0\left(\vec{r},{\vec{r}}^\prime\right)=G_0\left({\vec{r}}^\prime,\vec{r}\right)\)，因此</p>
+$$
+G_0^{-1}\left(\vec{r},E\right)=E-H_0\left(\vec{r}\right)
+$$
+<p>因此Schr&ouml;dinger方程可表示为：</p>
+$$
+\left[G_0^{-1}\left(\vec{r},E\right)-V\left(\vec{r}\right)\right]\mathrm{\Psi}_E=0
+$$
+<p>我们可以得到积分形式的Schr&ouml;dinger方程解：</p>
+$$
+\mathrm{\Psi}_E\left(\vec{r}\right)=\mathrm{\Psi}_E^0\left(\vec{r}\right)+\int r d{\vec{r}}^\prime G_0\left(\vec{r},{\vec{r}}^\prime;E\right)V\left({\vec{r}}^\prime\right)\mathrm{\Psi}_E\left({\vec{r}}^\prime\right)
+$$
+<p>写成迭代求解形式</p>
+$$
+\mathrm{\Psi}=\mathrm{\Psi}^0+G_0V\mathrm{\Psi}_0+G_0VG_0V\mathrm{\Psi}^0+G_0VG_0VG_0V\mathrm{\Psi}^0+\cdots=\mathrm{\Psi}^0+\left(G_0+G_0VG_0+G_0VG_0VG_0+\cdots\right)V\mathrm{\Psi}^0
+$$
+<p>因此完整的Green&rsquo;s function <em>G</em>可以表示为</p>
+$$
+G=G_0V+G_0VG_0V+G_0VG_0VG_0V+\cdots=G_0+G_0V\left(G_0+G_0VG_0+\cdots\right)
+$$
+<p>由此得到Dyson方程</p>
+$$
+G=G_0+G_0VG
+$$
+<p>这一方程是与Schr&ouml;dinger方程对应的。</p>
+<p>Green&rsquo;s function除了作为求解微分方程的工具，还可以在求解Schr&ouml;dinger方程中赋予更多物理意义，例如：考虑粒子的相互作用。</p>
+<p>DFA虽然通过考虑交换关联处理多体相互作用，但它只是一个单粒子图像的近似，实际上还是属于单粒子图像。单粒子图像以DFT为例具有以下缺点：</p>
+<ul>
+<li>GGA主要关注总能E<sub>tot</sub>的修正，但没有注意对准粒子能量本征值的改进。</li>
+<li>Self-interaction校正只能改善局域轨道能量本征值，对离域电子体系的能隙没有改进。</li>
+<li>LDA+U适用于过渡金属氧化物，但用于过渡金属体系本身计算结果常不合理(因为此时过渡金属即表现局域性又表现出离域性)。</li>
+<li>杂化泛函中精确交换泛函的引入导致计算量大，且没有考虑动态关联。</li>
+</ul>
+<ol start="2">
+<li>Green&rsquo;s function与自能</li>
+</ol>
+<p>GW approximation (GWA)是根据多体微扰理论(MBPT)发展起来的，其自能(self-energy, &sum;)具有如下特征：</p>
+<ul>
+<li>考虑了电子的Coulomb相互作用的动态屏蔽</li>
+<li>非局域且与能量相关</li>
+</ul>
+<p>在二次量子化框架下，含时格林函数可表示为：</p>
+$$
+\begin{aligned} i G\left(x, x^{\prime}\right)=&\left\langle N | T\left[\widehat{\Psi}(x) \widehat{\Psi}^{+}\left(x^{\prime}\right)\right] \| N\right\rangle \\ &=\theta\left(t-t^{\prime}\right)\left\langle N\left|\widehat{\Psi}(x) \widehat{\Psi}^{+}\left(x^{\prime}\right)\right| N\right\rangle \\ &-\theta\left(t^{\prime}-t\right)\left\langle N\left|\widehat{\Psi}^{+}\left(x^{\prime}\right) \widehat{\Psi}(x)\right| N\right\rangle \\ &=\left\{\begin{array}{l}{\left\langle N\left|\widehat{\Psi}(x) \widehat{\Psi}^{+}\left(x^{\prime}\right)\right| N\right\rangle, t>t^{\prime}} \\ {-\left\langle N\left|\widehat{\Psi}^{+}\left(x^{\prime}\right) \widehat{\Psi}(x)\right| N\right\rangle, t\lt t^{\prime}}\end{array}\right.\end{aligned}
+$$
+<p>用\(|\left.N\right\rangle\)来表示系统的基态，T是时间序列算符，其中&theta;是Heaviside阶梯函数，x=(<strong>r</strong>, t)，\({\hat{\mathrm{\Psi}}}^+\left(x\right)\)和\(\hat{\mathrm{\Psi}}\left(x\right)\)分别为Heisenberg表示下的产生和湮灭算符(场算符)。当t&gt;t&rsquo;时，Green函数描述空点(r&rsquo;, t&rsquo;)放入的电子向(r, t)传播；当t&lt;t&rsquo;时，Green函数描述粒子空点(r, t)产生的空穴向(r&rsquo;, t&rsquo;)传播。</p>
+<p>根据Heisenberg运动方程，场算符：</p>
+$$
+\mathrm{i}\frac{\partial\hat{\psi}\left(x\right)}{\partial t}=\left[\hat{\psi}\left(\mathrm{x}\right),\hat{H}\right]
+$$
+<p>其中Hamiltonian的二次量子化表示为：</p>
+$$
+\hat{H}=\int{d^3r}{\hat{\mathrm{\Psi}}}^+\left(x\right)h_0\left(\mathrm{x}\right)\hat{\psi}\left(\mathrm{x}\right)+\frac{1}{2}\int{d^3r}\mathrm{d}^\mathrm{3}r^\prime{\hat{\mathrm{\Psi}}}^+\left(\vec{r},t\right){\hat{\mathrm{\Psi}}}^+\left({\vec{r}}^\prime,t\right)v\left(\vec{r}-{\vec{r}}^\prime\right)\hat{\psi}\left({\vec{r}}^\prime,t\right)\hat{\psi}\left(\vec{r},t\right)
+$$
+<p>Green&rsquo;s function的运动方程</p>
+$$
+\left[i\frac{\partial}{\partial t}-h_0\left(\mathbf{x}\right)\right]G\left(\mathbf{x},\mathbf{x}^\prime\right)-\int d\mathbf{x}^{\prime\prime}M\left(\mathbf{x},\mathbf{x}^{\prime\prime}\right)G\left(\mathbf{x}^{\prime\prime},\mathbf{x}^\prime\right)=\delta\left(\mathbf{x}-\mathbf{x}^\prime\right)
+$$
+<p>其中质量算符M (Hartree 势+自能)的定义为：</p>
+$$
+\int d\mathbf{x}_\mathbf{1}M\left(\mathbf{x},\mathbf{x}_\mathbf{1}\right)G\left(\mathbf{x}_\mathbf{1},\mathbf{x}^\prime\right)=-\mathrm{i}\int d r_1v(\vec{r}-{\vec{r}}_1)\left\langle N\left|T\left[{\hat{\mathrm{\Psi}}}^+\left({\vec{r}}_1,t\right)\hat{\psi}\left({\vec{r}}_1,t\right)\hat{\psi}\left(\vec{r},t\right){\hat{\mathrm{\Psi}}}^+\left({\vec{r}}^\prime,t^\prime\right)\right]\right|N\right\rangle
+$$
+<p>这里h<sub>0</sub>是动能算符和局域外势之和，右侧是双粒子Green&rsquo;s function，一般定义为：</p>
+$$
+G_2\left(\mathbf{1},\mathbf{2},\mathbf{3},\mathbf{4}\right)=\left(\mathbf{i}\right)^2\left\langle N\left|T\left[\hat{\psi}\left(\mathbf{1}\right)\hat{\psi}\left(\mathbf{3}\right){\hat{\mathrm{\Psi}}}^+\left(\mathbf{4}\right){\hat{\mathrm{\Psi}}}^+\left(\mathbf{2}\right)\right]\right|N\right\rangle
+$$
+<p>其中\(\mathbf{1}\equiv\mathbf{x}_\mathbf{1}=\left(\vec{r_1},t_1\right)\)。为了导出自能的计算方案，引入含时变量场\(\phi\left(\vec{r},t\right)\)，根据相互作用表象(Dirac表象)</p>
+$$
+\left|\psi_D\left(\vec{r},t\right)\right\rangle=\hat{U}\left(t,t_0\right)\left|\psi_D\left(\vec{r},t_0\right)\right\rangle
+$$
+<p>含时变化算符的定义为：</p>
+$$
+\hat{U}\left(t,t_0\right)=T\exp{\left[-\mathrm{i}\int_{t_0}^{t}\mathrm{d}\tau\hat{\phi}\left(\tau\right)\right]}
+$$
+$$
+\hat{\phi}\left(\tau\right)=\int r d r\phi\left(\vec{r},\tau\right){\hat{\mathrm{\Psi}}}_D^+\left(\vec{r},\tau\right){\hat{\mathrm{\Psi}}}_D\left(\vec{r},t\right)
+$$
+<p>根据Heisenberg 表象和Dirac 算符的关系，场算符可表示为:</p>
+$$
+\hat{\psi}\left(\vec{r},t\right)={\hat{U}}^+\left(t,0\right){\hat{\psi}}_D\left(\vec{r},t\right)\hat{U}\left(t,0\right)
+$$
+<p>并满足</p>
+$$
+\mathrm{i}\frac{\partial}{\partial t}{\hat{\psi}}_D=\left[{\hat{\psi}}_D,\hat{H}\left(\phi=0\right)\right]
+$$
+<p>Green&rsquo;s function 可表示为:</p>
+$$
+\mathrm{i}G\left(\mathbf{1},\mathbf{2}\right)=\frac{\left\langle N^0\middle| T\left[\hat{U}\left(\infty,-\infty\right){\hat{\psi}}_D\left(\mathbf{1}\right){\hat{\psi}}_D^+\left(\mathbf{2}\right)\right]|N^0\right\rangle}{\left\langle N^0\left|\hat{U}\left(\infty,-\infty\right)\right|N^0\right\rangle}
+$$
+<p>泛函G 对ϕ 的导数</p>
+$$
+\frac{\delta G\left(\mathbf{1},\mathbf{2}\right)}{\delta\phi\left(\mathbf{3}\right)}=G\left(\mathbf{1},\mathbf{2}\right)G\left({\mathbf{3},\mathbf{3}}^+\right)-G_2\left({\mathbf{1},\mathbf{2},\mathbf{3},\mathbf{3}}^+\right)
+$$
+<p>可以注意到M 和双粒子Green&rsquo;s function 的关系，且GG 给出Hartree 势<em>V <sup>H</sup></em>，因此</p>
+$$
+\mathrm{\Sigma}=M-V^\mathrm{H}
+$$
+<p>因此Green&rsquo;s function 的运动方程可写为：</p>
+$$
+\left[\mathrm{i}\frac{\partial}{\partial t}-H_0\left(\mathrm{x}\right)\right]G\left(\mathrm{x},\mathrm{x}^\mathrm{'}\right)-\int r d\mathrm{x}^{\mathrm{''}}\mathrm{\Sigma}\left(\mathrm{x},\mathrm{x}^{\mathrm{''}}\right)G\left(\mathrm{x}^{\mathrm{''}},\mathrm{x}^\mathrm{'}\right)=\delta\left(\mathrm{x}-\mathrm{x}^\mathrm{'}\right)
+$$
+<p>其中\(H_0=h_0+V^\mathrm{H}+\phi\)，自能可表示为：</p>
+$$
+\mathrm{\Sigma}\left(\mathbf{1},\mathbf{2}\right)=\mathrm{i}\int d\mathbf{3}\mathrm{d}\mathbf{4}G\left({\mathbf{1},\mathbf{3}}^+\right)W\left(\mathbf{1},\mathbf{4}\right)\mathrm{\Lambda}\left(\mathbf{3},\mathbf{2},\mathbf{4}\right)
+$$
+<p>这里W 是屏蔽Coulomb 势：</p>
+$$
+W\left(\mathbf{1},\mathbf{2}\right)=\int d3\epsilon^{-1}\left(\mathbf{1},\mathbf{3}\right)v\left(\mathbf{3}-\mathbf{2}\right)
+$$
+$$
+\epsilon^{-1}\left(\mathbf{1},\mathbf{2}\right)=\frac{\delta V\left(\mathbf{1}\right)}{\delta\phi\left(\mathbf{2}\right)}
+$$
+<p>这里V 是Hartree 势和外势之和，即\(V=V^\mathrm{H}+\phi\)；&nbsp;是顶角函数(vertex function)：</p>
+$$
+\mathrm{\Lambda}\left(\mathbf{1},\mathbf{2},\mathbf{3}\right)=-\frac{\delta G^{-1}\left(\mathbf{1},\mathbf{2}\right)}{\delta V\left(\mathbf{3}\right)}=\delta\left(\left(1\right)-\mathbf{2}\right)\delta\left(\mathbf{2}-\mathbf{3}\right)+\frac{\delta\Sigma\left(\mathbf{1},\mathbf{2}\right)}{\delta V\left(\mathbf{3}\right)}=\delta\left(\left(1\right)-\mathbf{2}\right)\delta\left(\mathbf{2}-\mathbf{3}\right)+\int{d\left(\mathbf{4567}\right)\frac{\delta\Sigma\left(\mathbf{1},2\right)}{\delta G\left(\mathbf{4},\mathbf{5}\right)}}G\left(\mathbf{4},\mathbf{6}\right)G\left(\mathbf{7},\mathbf{5}\right)\mathrm{\Lambda}\left(\mathbf{6},\mathbf{7},\mathbf{3}\right)
+$$
+<ol start="3">
+<li>自能与Dyson 方程：</li>
+</ol>
+<p>根据Fourier 变换</p>
+$$
+\left[\omega-H_0\left(\vec{r}\right)\right]G\left(\vec{r},{\vec{r}}^\prime;\omega\right)-\int{rd^3r^{\prime\prime}\mathrm{\Sigma}\left(\vec{r},{\vec{r}}^{\prime\prime};\omega\right)G\left({\vec{r}}^{\prime\prime},{\vec{r}}^\prime;\omega\right)}=\delta\left(\vec{r}-{\vec{r}}^\prime\right)
+$$
+<p>当<em>G<sub>0</sub></em> 是对应于&sum; = 0 的Green&rsquo;s function，因此Dyson 方程</p>
+$$
+G=G_0+G_0\mathrm{\Sigma G}
+$$
+<p>这里<em>G<sub>0</sub></em>(<strong>1</strong>, <strong>2</strong>) 描述独立粒子由<strong>1</strong> 向<strong>2</strong> 传播，&sum;包含粒子由<strong>1</strong> 向<strong>2</strong>传播中全部交换关联作用。实际应用中，<em>G<sub>0</sub></em>对应于\(H_0=H^{\mathrm{Hartree}}+V^{\mathrm{XC}}\)，是局域的交换关联势，Dyson 方程可写成：</p>
+<p>\(G=G_0+G_0\mathrm{\Delta\Sigma G}\)，其中\(\mathrm{\Delta\Sigma}=\mathrm{\Sigma}-V^{\mathrm{XC}}\)</p>
+<ol start="4">
+<li>极化函数和响应函数</li>
+</ol>
+<p>实际的自能计算中，必须先计算极化函数和响应函数。极化函数描述总的外势改变引起电荷密度的变化：</p>
+$$
+P\left(1,2\right)=\frac{\delta\rho\left(1\right)}{\delta V\left(2\right)}
+$$
+<p>注意到电荷密度满足：</p>
+$$
+\rho\left(\mathbf{1}\right)=-\mathrm{i}G\left(\mathbf{1},\mathbf{1}^+\right)
+$$
+<p>因此，</p>
+$$
+P\left(\mathbf{1},\mathbf{2}\right)=-\mathrm{i}\int r d\mathbf{3}\mathrm{d}4G\left(\mathbf{1},\mathbf{3}\right)\mathrm{\Lambda}\left(\mathbf{3},\mathbf{4},\mathbf{2}\right)G\left(\mathbf{4},\mathbf{1}^+\right)
+$$
+<p>而响应函数则描述了外势的改变引起电荷密度的变化：</p>
+$$
+R\left(1,2\right)=\frac{\delta\rho\left(1\right)}{\delta\phi\left(2\right)}
+$$
+<p>介电函数的倒数ϵ<sup>-1</sup>关联响应函数和极化函数：</p>
+$$
+\epsilon^{-1}=\frac{\delta v}{\delta\phi}=1+v\frac{\delta\rho}{\delta\phi}=1+v\frac{\delta\rho}{\delta V}\frac{\delta V}{\delta\phi}
+$$
+<ol start="5">
+<li>Hedin 方程</li>
+</ol>
+<p>尽管格林函数包含了多体系统的丰富信息，但是严格计算格林函数与求解多体薛定谔方程本身一样困难。虽然Lehmann表示给出了格林函数的物理意义，但是它并没有给我们提供任何求解的方法，我们还需要找到一些别的近似方法。后期经过一系列的发展，Hedin推导出了五个方程，通过这五个方程我们可以自洽的确定格林函数和自能算符，过程示意图展示在图1a。</p>
+<p>首先，响应函数、极化函数和屏蔽Coulomb势之间存在如下关系：</p>
+$$
+\epsilon^{-1}=1+v\chi\Rightarrow\epsilon=1-vP
+$$
+$$
+\chi=P+P\ v\ \chi
+$$
+$$
+W=v+v\ P\ W=v+v\ \chi\ v
+$$
+<p>根据Dyson方程和自能表达式，</p>
+$$
+G\left(\mathbf{1},\mathbf{2}\right)=G_0\left(\mathbf{1},\mathbf{2}\right)+\int{rd\left(\mathbf{3}4\right)G_0\left(\mathbf{1},\mathbf{3}\right)\mathrm{\Sigma}\left(\mathbf{3},\mathbf{4}\right)G\left(4,\mathbf{2}\right)}
+$$
+$$
+\mathrm{\Sigma}\left(\mathbf{1},\mathbf{2}\right)=\mathrm{i}\int d\left(\mathbf{34}\right)G\left(\mathbf{1},\mathbf{3}^+\right)W\left(\mathbf{1},\mathbf{4}\right)\mathrm{\Lambda}\left(\mathbf{3},\mathbf{2},\mathbf{4}\right)
+$$
+<p>可以得到Hedin方程：</p>
+$$
+\mathrm{\Lambda}\left(\mathbf{3},\mathbf{4}\right)G\left(\mathbf{4},\mathbf{2}\right)=\delta\left(\mathbf{1}-\mathbf{2}\right)\delta\left(\mathbf{2}-\mathbf{3}\right)+\int{d\left(\mathbf{4567}\right)\frac{\delta\Sigma\left(\mathbf{1},\mathbf{2}\right)}{\delta G\left(\mathbf{4},\mathbf{5}\right)}}G\left(\mathbf{4},\mathbf{6}\right)G\left(\mathbf{7},\mathbf{5}\right)\mathrm{\Lambda}\left(\mathbf{6},\mathbf{7},\mathbf{3}\right)
+$$
+$$
+W\left(\mathbf{1},\mathbf{2}\right)=v\left(\mathbf{1},\mathbf{2}\right)+\int r d\left(\mathbf{34}\right)v\left(\mathbf{1},\mathbf{3}\right)P\left(\mathbf{3},\mathbf{4}\right)W\left(\mathbf{4},\mathbf{2}\right)
+$$
+$$
+\chi\left(\mathbf{1},\mathbf{2}\right)=-i\int G\left(\mathbf{1},\mathbf{3}\right)\mathrm{\Lambda}\left(\mathbf{3},\mathbf{4},\mathbf{2}\right)G\left({\mathbf{4},\mathbf{1}}^+\right)d\mathbf{3}d\mathbf{4}
+$$
+<p>图1. 各种物理量通过Hedin方程相互关联，(a)完整的Hedin方程，(b) GWA近似下的。其中W为屏蔽相互作用，G为多体传播子，&Gamma;为vertex函数(描述虚空穴和激发电子的相互作用)，为不可约极化率。</p>
+<p>6. 准粒子图像</p>
+<p>粒子Green&rsquo;s function经Fourier 变换，称为谱表示(Lehmann表示)：</p>
+$$
+G\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\sum_{i}\frac{\mathrm{\Psi}_i\left(\vec{r},\omega\right)\mathrm{\Psi}_i^+\left({\vec{r}}^\prime,\omega\right)}{\omega-\varepsilon_i+\mathrm{i} \eta sign\left(\varepsilon_i-\mu\right)}\ \eta\rightarrow0^+
+$$
+<p>这里\(\mathrm{\Psi}_i\)满足准粒子方程:</p>
+$$
+H_0\left(r\right)\mathrm{\Psi}_i\left(\vec{r},\omega\right)+\int{rd^3r}\mathrm{\Sigma}\left(\vec{r},{\vec{r}}^\prime;\omega\right)\mathrm{\Psi}_i\left({\vec{r}}^\prime,\omega\right)=\varepsilon_i\left(\omega\right)\mathrm{\Psi}_i\left(\vec{r},\omega\right)
+$$
+<p>准粒子方程的特点:</p>
+<ul>
+<li>能量本征值\(\varepsilon_i\)是复数</li>
+<li>自能\(\mathrm{\Sigma}\)是非Hermitian</li>
+<li>准粒子波函数\(\mathrm{\Psi}_i\)是非正交的</li>
+</ul>
+<p>如果准粒子能量本征值\(\varepsilon_i\left(\omega\right)\)满足\(\varepsilon_i=\mathfrak{R}\varepsilon_i\left(\omega_i\right)\)，当当能量虚部\(\mathfrak{I}\varepsilon_i\left(\omega_i\right)\)很小，对应的Green&rsquo;s function 虚部在此能量出现峰值，该准粒子态的寿命为\(1/\mathfrak{I}\varepsilon_i\left(\omega_i\right)\)。对于无相互作用粒子体系，自能\(\mathrm{\Sigma}\)是Hermitian，能量本征值是实数，处于准粒子定态。</p>
+<p>图2. 按时间顺序表示格林函数极点位置的示意图。</p>
+<p>粒子数表象下的谱表示</p>
+$$
+G\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\int_{-\infty}^{\mu}\mathrm{d}\omega^\prime\frac{A\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime-\mathrm{i} \delta}+\int_{\mu}^{+\infty}\mathrm{d}\omega^\prime\frac{A\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime+\mathrm{i} \delta}
+$$
+<p>利用二次量子化，准粒子Green&rsquo;s function 的谱表示可以表示为：</p>
+<p>这里谱函数(spectral function)A 的定义为：</p>
+$$
+A\left(\vec{r},{\vec{r}}^\prime;\omega\right)=-\frac{1}{\pi}\mathfrak{I}G\left(\vec{r},{\vec{r}}^\prime;\omega\right)sign\left(\omega-\mu\right)=\sum_{i}{h_i\left(\vec{r}\right)h_i^\ast\left({\vec{r}}^\prime\right)\delta\left[\omega-\mu+e\left(N-1,i\right)\right]}+\sum_{i}{p_i^\ast\left(\vec{r}\right)h_i\left({\vec{r}}^\prime\right)\delta\left[\omega-\mu-e\left(N+1,i\right)\right]}
+$$
+<p>其中</p>
+$$
+h_i\left(\vec{r}\right)=\left\langle N-1,i\left|\hat{\psi}\left(\vec{r},0\right)\right|N\right\rangle
+$$
+$$
+p_i\left(\vec{r}\right)=\left\langle N+1,i\left|{\hat{\psi}}^+\left(\vec{r},0\right)\right|N\right\rangle
+$$
+<p>由此可得激发能(正值)：</p>
+$$
+e\left(N\pm1,i\right)=E\left(N\pm1,i\right)-E\left(N\pm1\right)
+$$
+<p>其中\(E\left(N\pm1\right)\)是\(N\pm1\)个电子的基态能量。&mu;是化学势 (图2)，定义为：</p>
+$$
+\mu=E\left(N+1\right)-E\left(N\right)=E\left(N\right)-E\left(N-1\right)
+$$
+<p>整数电子体系能隙(Band Gap)的基础定义：</p>
+$$
+E_{\mathrm{gap}}^{\mathrm{integer\ }}=(E\left(N-1\right)-E\left(N\right))-(E\left(N\right)-E\left(N+1\right))
+$$
+<p>而周期性体系的能隙的定义则为其导数：</p>
+$$
+E_{gap}^{deriv}=\left\{\left.\frac{\partial E}{\partial N}\right|_{N+\delta}-\left.\frac{\partial E}{\partial N}\right|_{N-\delta}\right\}
+$$
+<p>Green&rsquo;s function 的极点的物理意义:\(N\pm1\)电子的激发能，即\(\mathfrak{R}\varepsilon_i\left(\omega_i\right)\)。对应\(N\pm1\)电子的激发能。根据Dyson 方程，谱函数与自能的关系：</p>
+<p>谱函数(态密度)A 的特点：</p>
+$$
+A\left(\omega\right)=\frac{1}{\pi}\sum_{i}\left|\mathfrak{I}G_i\left(\omega\right)\right|=\frac{1}{\pi}\sum_{i}\frac{\mathfrak{I}\mathrm{\Sigma}_i\left(\omega\right)}{\left|\omega-\varepsilon_i-\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\omega\right)\right|^2+\left|\mathfrak{I}\mathrm{\Sigma}_i\left(\omega\right)\right|^2}
+$$
+<ul>
+<li>峰位对应于准粒子能量：
+$$
+\varepsilon_i^{\mathrm{QP}}=\varepsilon_i+\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\varepsilon_i^{\mathrm{QP}}\right)=\varepsilon_i+\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\varepsilon_i\right)+\left(\varepsilon_i^{\mathrm{QP}}-\varepsilon_i\right)\frac{\partial\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\varepsilon_i\right)}{\partial\omega}=\varepsilon_i+Z_i\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\varepsilon_i\right)
+$$
+<p>这里称为重整化因子：</p>
+$$
+Z_i=\left[1-\frac{\partial\mathfrak{R}\mathrm{\Delta}\mathrm{\Sigma}_i\left(\varepsilon_i^{\mathrm{QP}}\right)}{\partial\omega}\right]<1
+$$
+</li>
+</ul>
+
+<ul>
+<li>准粒子峰的寿命：
+$$
+1/\mathfrak{I}\varepsilon_i\left(\omega_i\right)
+$$
+</li>
+</ul>
+<p>7. GW近似</p>
+<ul>
+<li>GWA 的本质可以看作是Hartree-Fock 近似推广到引入动态屏蔽Coulomb相互作用。Hartree-Fock 交换势写为：</li>
+$$
+\mathrm{\Sigma}^\mathrm{x}\left(\vec{r},{\vec{r}}^\prime\right)=-\sum_{\vec{k},n}^{\mathrm{occ}}{\psi_{\vec{k},n}\left(\vec{r}\right)\psi_{\vec{k},n}^\ast\left({\vec{r}}^\prime\right)v\left(\vec{r}-{\vec{r}}^\prime\right)}
+$$
+<p>而在Green&rsquo;s function 理论中，交换势的表示为：</p>
+$$
+\sum^{\mathrm{X}}\left(\vec{r},{\vec{r}}^\prime;t-t^\prime\right)=\mathrm{i}G\left(\vec{r},{\vec{r}}^\prime;t-t^\prime\right)v\left(\vec{r}-{\vec{r}}^\prime\right)\delta\left(t-t^\prime\right)
+$$
+</ul>
+
+<ul>
+<li>在GWA 中，裸的Coulomb 势变成屏蔽相互作用W
+$$
+\mathrm{\Sigma}\left(\mathbf{1},\mathbf{2}\right)=\mathrm{i}G\left(\mathbf{1},\mathbf{2}\right)W\left(\mathbf{1},\mathbf{2}\right)
+$$</li>
+<li>GWA 的重要近似 (图2b): 忽略顶角函数\(\mathrm{\Lambda}\left(\mathbf{1},\mathbf{2},\mathbf{3}\right)=\delta\left(\mathbf{1}-\mathbf{2}\right)\delta\left(\mathbf{2}-\mathbf{3}\right)\)</li>
+</ul>
+<p>GWA 的极化函数与RPA：</p>
+<p>为了计算屏蔽Coulomb相互作用<em>W</em>，必须先计算<em>P</em>，一般采用RPA，用无相互作用Green&rsquo;s function <em>G<sub>0</sub></em>，忽略顶角函数,</p>
+$$
+P\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\sum_{spin}\sum_{\vec{k},n}^{\mathrm{occ\ }}\sum_{\vec{k}\prime,n\prime}^{\mathrm{unocc\ }}{\psi_{\vec{k},n}^\ast\left(\vec{r}\right)\psi_{\vec{k^\prime},n^\prime}\left(\vec{r}\right)\psi_{\vec{k^\prime},n^\prime}^\ast\left({\vec{r}}^\prime\right)\psi_{\vec{k},n}\left({\vec{r}}^\prime\right)}\times\left\{\frac{1}{\omega-\varepsilon_{\vec{k^\prime},n^\prime}+\varepsilon_{\vec{k},n}+\mathrm{i} \delta}+\frac{1}{\omega+\varepsilon_{\vec{k^\prime},n^\prime}-\varepsilon_{\vec{k},n}-\mathrm{i} \delta}\right\}
+$$
+<p>作Fourier 变换，可有极化函数矩阵元:</p>
+$$
+P_{{\vec{G}}_1,{\vec{G}}_2}^0\left(\vec{q},\omega\right)=\sum_{s_{\mathrm{pin}}}\sum_{\vec{k}}\sum_{n}^{occ}\sum_{m}^{\mathrm{unocc\ }}\left\langle\vec{k},n\left|\mathrm{e}^{\mathrm{i}\left(\vec{\mathrm{q}}\mathrm{+} {\vec{G}}_1\right)\mathrm{\cdot} \vec{\mathrm{r}}}\right|\vec{k}+\vec{q},m\right\rangle\left\langle\vec{k}+\vec{q},m\left|\mathrm{e}^{\mathrm{-i}\left(\vec{\mathrm{q}}\mathrm{+} {\vec{G}}_2\right)\mathrm{\cdot} \vec{\mathrm{r}}}\right|\vec{k},n\right\rangle\times\left\{\frac{1}{\omega-\varepsilon_{\vec{k}}+\vec{q},m}+\varepsilon_{\vec{k},n}+\mathrm{i} \delta+\frac{1}{\omega+\varepsilon_{\vec{k}+\vec{q},m}-\varepsilon_{\vec{k},n}-\mathrm{i} \delta}\right\}
+$$
+
+<p>GWA的自能交换关联</p>
+<p>GWA 的自能交换(动态屏蔽Coulomb 相互作用)：</p>
+$$
+\mathrm{\Sigma}^\mathrm{x}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\frac{\mathrm{i} }{2\pi}\int r d\omega^\prime G\left(\vec{r},{\vec{r}}^\prime;\omega+\omega^\prime\right)W\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)
+$$
+<p>对于无相互作用体系的<em>G<sub>0</sub></em>，自能关联部分的虚部可以表示为：</p>
+$$
+\mathfrak{I}\mathrm{\Sigma}^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega\le\mu\right)=\pi\sum_{\vec{k},n}^{\mathrm{occ}}{\psi_{\vec{k},n}\left(\vec{r}\right)\psi_{\vec{k},n}^\ast\left({\vec{r}}^\prime\right)\mathfrak{I}W^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\varepsilon_{\vec{k},n}-\omega\right)\theta\left(\varepsilon_{\vec{k},n}-\omega\right)}
+$$
+$$
+\mathfrak{I}\mathrm{\Sigma}^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega>\mu\right)=-\pi\sum_{\vec{k},n}^{\mathrm{unocc\ }}{\psi_{\vec{k},n}\left(\vec{r}\right)\psi_{\vec{k},n}^\ast\left({\vec{r}}^\prime\right)\mathfrak{I}W^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega-\varepsilon_{\vec{k},n}\right)\theta\left(\omega-\varepsilon_{\vec{k},n}\right)}
+$$
+<p>这里<em>W<sup>c</sup> </em>= <em>W</em>-<em>v</em>，其频率表示：</p>
+$$
+W^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\int_{-\infty}^{0}\mathrm{d}\omega^\prime\frac{D\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime-\mathrm{i} \delta}+\int_{0}^{\infty}\mathrm{d}\omega^\prime\frac{D\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime+\mathrm{i} \delta}
+$$
+<p><em>D</em>称为等离子频率，是关于&omega;是反对称的，正比于<em>W</em> 的虚部</p>
+$$
+D\left(\vec{r},{\vec{r}}^\prime;\omega\right)=-\frac{1}{\pi}\mathfrak{I}W^c\left(\vec{r},{\vec{r}}^\prime;\omega\right)sign\left(\omega\right)
+$$
+$$
+D\left(\vec{r},{\vec{r}}^\prime;\omega\right)=-D\left(\vec{r},{\vec{r}}^\prime;\omega\right)
+$$
+<p>GWA 的自能关联部分：</p>
+$$
+\mathrm{\Sigma}^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\int_{-\infty}^{\mu}\mathrm{d}\omega^\prime\frac{\mathrm{\Gamma}\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime-\mathrm{i} \delta}+\int_{\mu}^{\infty}\mathrm{d}\omega^\prime\frac{\mathrm{\Gamma}\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\omega^\prime+\mathrm{i} \delta}
+$$
+<p>其中</p>
+$$
+\mathrm{\Gamma}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=-\frac{1}{\pi}\mathfrak{I}\mathrm{\Sigma}^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;\omega\right)sign\left(\omega-\mu\right)
+$$
+<p>自能关联部分\(\mathrm{\Sigma}^\mathrm{c}\)的实部由积分主值得到。</p>
+<p>综上所述，自能可分解成屏蔽交换项\(\sum_{SEX}\)和相关孔项\(\sum_{COH}\)，其实部可表示为：</p>
+$$
+\mathfrak{R}\mathrm{\Sigma}_{\mathrm{SEX}}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=-\sum_{i}^{\mathrm{occ}}{\psi_i\left(\vec{r}\right)\psi_i^\ast\left({\vec{r}}^\prime\right)\mathfrak{R}W\left(\vec{r},{\vec{r}}^\prime;\omega-\varepsilon_i\right)}
+$$
+$$
+\mathfrak{R}\mathrm{\Sigma}_{\mathrm{COH}}\left(\vec{r},{\vec{r}}^\prime;\omega\right)=\sum_{i}{\psi_i\left(\vec{r}\right)\psi_i^\ast\left({\vec{r}}^\prime\right)\mathcal{P}}\int_{0}^{+\infty}\mathrm{d}\omega^\prime\frac{D\left(\vec{r},{\vec{r}}^\prime;\omega^\prime\right)}{\omega-\varepsilon_i-\omega^\prime}
+$$
+<p>当关注的能量<em>&omega; </em>接近Fermi 能级，矩阵元\(\left\langle\psi\middle|\mathfrak{R}\mathrm{\Sigma}_{\mathrm{COH}}\left(\omega\right)|\psi\right\rangle\)计算了接近&omega; 的能量本征态的贡献，令\(ω -\ \varepsilon_i= 0\)，</p>
+$$
+\mathfrak{R}\mathrm{\Sigma}_{\mathrm{COH}}\left(\vec{r},{\vec{r}}^\prime\right)=\frac{1}{2}\delta\left(\vec{r}-{\vec{r}}^\prime\right)W^\mathrm{c}\left(\vec{r},{\vec{r}}^\prime;0\right)
+$$
+<p>这是简化的准粒子相互作用能，因子1/2 来自绝热开启相互作用，静态COHSEX 近似下，\(\sum_{COH}\)是局域的。</p>
+<p><strong>&nbsp;</strong></p>
+<p><strong>参考文献</strong>：</p>
+<p>[1]&nbsp; L. Hedin, Physical Review <strong>139</strong>, A796 (1965).</p>
+<p>[2]&nbsp; W. Gao, W. Xia, X. Gao, and P. Zhang, Scientific reports <strong>6</strong>, 36849 (2016).</p>
+<p>[3]&nbsp; V. M. Goldschmidt, Naturwissenschaften <strong>14</strong>, 477 (1926).</p>
+<p>[4]&nbsp; R. D. Shannon, Acta crystallographica section A: crystal physics, diffraction, theoretical and general crystallography <strong>32</strong>, 751 (1976).</p>
+<p>[5]&nbsp; R. Ali and M. Yashima, Journal of Solid State Chemistry <strong>178</strong>, 2867 (2005).</p>
+<p>[6]&nbsp; H. F. Kay and P. Vousden, The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science <strong>40</strong>, 1019 (1949).</p>
+<p>[7]&nbsp; G. Shirane, J. Axe, J. Harada, and J. Remeika, Physical Review B <strong>2</strong>, 155 (1970).</p>
+<p>[8]&nbsp; P. Fleury, J. Scott, and J. Worlock, Physical Review Letters <strong>21</strong>, 16 (1968).</p>
+<p>[9]&nbsp; B. J. Kennedy, Q. Zhou, S. Zhao, F. Jia, W. Ren, and K. S. Knight, Physical Review B <strong>96</strong>, 214105 (2017).</p>
+<p>[10]&nbsp; E. Bousquet, M. Dawber, N. Stucki, C. Lichtensteiger, P. Hermet, S. Gariglio, J.-M. Triscone, and P. Ghosez, Nature <strong>452</strong>, 732 (2008).</p>
+<p>[11]&nbsp; P. V. Balachandran, D. Xue, and T. Lookman, Physical Review B <strong>93</strong>, 144111 (2016).</p>
+<p>[12]&nbsp; 赵国栋, 杨亚利, and 任伟, 物理学报 <strong>67</strong>, 157504 (2018).</p>
+<p>[13]&nbsp; X. Cheng and M. Shen, Solid state communications <strong>141</strong>, 587 (2007).</p>
+<p>[14]&nbsp; D. Fu, M. Itoh, S.-y. Koshihara, T. Kosugi, and S. Tsuneyuki, Physical review letters <strong>100</strong>, 227601 (2008).</p>
+<p>[15]&nbsp; A. Glazer and S. Mabud, Acta Crystallographica Section B <strong>34</strong>, 1065 (1978).</p>
+<p>[16]&nbsp; M. J. Haun, E. Furman, S. Jang, H. McKinstry, and L. Cross, Journal of Applied Physics <strong>62</strong>, 3331 (1987).</p>
+<p>[17]&nbsp; A. Hewat, Journal of Physics C: Solid State Physics <strong>6</strong>, 2559 (1973).</p>
+<p>[18]&nbsp; W. Kleemann, F. Sch&auml;fer, and M. Fontana, Physical Review B <strong>30</strong>, 1148 (1984).</p>
+<p>[19]&nbsp; J. Harada, T. Pedersen, and Z. Barnea, Acta Crystallographica Section A: Crystal Physics, Diffraction, Theoretical and General Crystallography <strong>26</strong>, 336 (1970).</p>
+<p>[20]&nbsp; H. Wieder, Physical Review <strong>99</strong>, 1161 (1955).</p>
+<p>[21]&nbsp; P. Zhang and V. H. Crespi, Physical review letters <strong>89</strong>, 056403 (2002).</p>
+<p>[22]&nbsp; M. C. Nguyen, X. Zhao, C.-Z. Wang, and K.-M. Ho, RSC Advances <strong>4</strong>, 15061 (2014).</p>
+<p>[23]&nbsp; J. Harl, L. Schimka, and G. Kresse, Physical Review B <strong>81</strong>, 115126 (2010).</p>
+<p>[24]&nbsp; T. Olsen and K. S. Thygesen, Physical Review B <strong>86</strong>, 081103 (2012).</p>
+<p>[25]&nbsp; J. Erhard, P. Bleiziffer, and A. G&ouml;rling, Physical review letters <strong>117</strong>, 143002 (2016).</p>
+<p>[26]&nbsp; A. Gr&uuml;neis, M. Marsman, J. Harl, L. Schimka, and G. Kresse, The Journal of chemical physics <strong>131</strong>, 154115 (2009).</p>
+<p>[27]&nbsp; I. Aguilera, C. Friedrich, and S. Bl&uuml;gel, Physical Review B <strong>88</strong>, 165136 (2013).</p>
+
+
+
+</div></section>
+</div>
+</main>
+			<script src="../assets/js/jquery-3.3.1.slim.min.js"></script>
+			<script src="../assets/js/popper.min.js"></script>
+			<script src="../assets/js/bootstrap.min.js"></script>
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
